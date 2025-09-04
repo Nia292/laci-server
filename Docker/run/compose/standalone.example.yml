@@ -58,7 +58,7 @@ services:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${SINUS_POSTGRES_DB};Username=${SINUS_POSTGRES_USER};Password=${SINUS_POSTGRES_PASSWORD};Keepalive=15;Minimum Pool Size=10;Maximum Pool Size=50;No Reset On Close=true;Max Auto Prepare=50;Enlist=false"
       DOTNET_USE_POLLING_FILE_WATCHER: 1
     volumes:
-      - ../config/standalone/services.base.appsettings.json:/opt/SinusSynchronousServices/base.appsettings.json
+      - ../config/standalone/base.appsettings.json:/opt/SinusSynchronousServices/base.appsettings.json
       - ../config/standalone/services.appsettings.json:/opt/SinusSynchronousServices/appsettings.json
       - ../log/services-standalone/:/opt/SinusSynchronousServices/logs/:rw
     depends_on:
@@ -80,7 +80,7 @@ services:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${SINUS_POSTGRES_DB};Username=${SINUS_POSTGRES_USER};Password=${SINUS_POSTGRES_PASSWORD};Keepalive=15;Minimum Pool Size=10;Maximum Pool Size=50;No Reset On Close=true;Max Auto Prepare=50;Enlist=false"
       DOTNET_USE_POLLING_FILE_WATCHER: 1
     volumes:
-      - ../config/standalone/authservice.base.appsettings.json:/opt/SinusSynchronousAuthService/base.appsettings.json
+      - ../config/standalone/base.appsettings.json:/opt/SinusSynchronousAuthService/base.appsettings.json
       - ../config/standalone/authservice.appsettings.json:/opt/SinusSynchronousAuthService/appsettings.json
       - ../log/authservice-standalone/:/opt/SinusSynchronousAuthService/logs/:rw
     depends_on:
@@ -100,7 +100,7 @@ services:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${SINUS_POSTGRES_DB};Username=${SINUS_POSTGRES_USER};Password=${SINUS_POSTGRES_PASSWORD};Keepalive=15;Minimum Pool Size=10;Maximum Pool Size=50;No Reset On Close=true;Max Auto Prepare=50;Enlist=false"
       DOTNET_USE_POLLING_FILE_WATCHER: 1
     volumes:
-      - ../config/standalone/files.base.appsettings.json:/opt/SinusSynchronousStaticFilesServer/base.appsettings.json
+      - ../config/standalone/base.appsettings.json:/opt/SinusSynchronousStaticFilesServer/base.appsettings.json
       - ../config/standalone/files.appsettings.json:/opt/SinusSynchronousStaticFilesServer/appsettings.json
       - ../log/files-standalone/:/opt/SinusSynchronousStaticFilesServer/logs/:rw
       - ../data/files-standalone/:/sinuscache/:rw
