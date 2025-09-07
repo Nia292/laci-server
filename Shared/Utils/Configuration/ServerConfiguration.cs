@@ -2,7 +2,7 @@
 
 namespace LaciSynchroni.Shared.Utils.Configuration;
 
-public class ServerConfiguration : SinusConfigurationBase
+public class ServerConfiguration : LaciConfigurationBase
 {
     [RemoteConfiguration]
     public Uri CdnFullUrl { get; set; } = null;
@@ -34,7 +34,7 @@ public class ServerConfiguration : SinusConfigurationBase
     public int HubExecutionConcurrencyFilter { get; set; } = 50;
 
     [RemoteConfiguration]
-    public string ServerName { get; set; } = "Sinus Synchronous";
+    public string ServerName { get; set; } = "Laci Synchroni";
     [RemoteConfiguration]
     public Uri ServerPublicUri { get; set; } = new Uri("wss://noemptyuri");
     public string DiscordInvite { get; set; }

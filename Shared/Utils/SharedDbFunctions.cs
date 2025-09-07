@@ -7,7 +7,7 @@ namespace LaciSynchroni.Shared.Utils;
 
 public static class SharedDbFunctions
 {
-    public static async Task<(bool, string)> MigrateOrDeleteGroup(SinusDbContext context, Group group, List<GroupPair> groupPairs, int maxGroupsByUser)
+    public static async Task<(bool, string)> MigrateOrDeleteGroup(LaciDbContext context, Group group, List<GroupPair> groupPairs, int maxGroupsByUser)
     {
         bool groupHasMigrated = false;
         string newOwner = string.Empty;
@@ -33,7 +33,7 @@ public static class SharedDbFunctions
         return (groupHasMigrated, newOwner);
     }
 
-    public static async Task PurgeUser(ILogger _logger, User user, SinusDbContext dbContext, int maxGroupsByUser)
+    public static async Task PurgeUser(ILogger _logger, User user, LaciDbContext dbContext, int maxGroupsByUser)
     {
         _logger.LogInformation("Purging user: {uid}", user.UID);
 
@@ -114,7 +114,7 @@ public static class SharedDbFunctions
         await dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    private static async Task<bool> TryMigrateGroup(SinusDbContext context, Group group, string potentialNewOwnerUid, int maxGroupsByUser)
+    private static async Task<bool> TryMigrateGroup(LaciDbContext context, Group group, string potentialNewOwnerUid, int maxGroupsByUser)
     {
         var newOwnerOwnedGroups = await context.Groups.CountAsync(g => g.OwnerUID == potentialNewOwnerUid).ConfigureAwait(false);
         if (newOwnerOwnedGroups >= maxGroupsByUser)

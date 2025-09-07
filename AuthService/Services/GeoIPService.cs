@@ -8,7 +8,7 @@ namespace LaciSynchroni.AuthService.Services;
 public class GeoIPService : IHostedService
 {
     private readonly ILogger<GeoIPService> _logger;
-    private readonly IConfigurationService<AuthServiceConfiguration> _sinusConfiguration;
+    private readonly IConfigurationService<AuthServiceConfiguration> _authServiceConfiguration;
     private bool _useGeoIP = false;
     private string _cityFile = string.Empty;
     private DatabaseReader? _dbReader;
@@ -17,10 +17,10 @@ public class GeoIPService : IHostedService
     private bool _processingReload = false;
 
     public GeoIPService(ILogger<GeoIPService> logger,
-        IConfigurationService<AuthServiceConfiguration> sinusConfiguration)
+        IConfigurationService<AuthServiceConfiguration> authServiceConfiguration)
     {
         _logger = logger;
-        _sinusConfiguration = sinusConfiguration;
+        _authServiceConfiguration = authServiceConfiguration;
     }
 
     public async Task<string> GetCountryFromIP(IHttpContextAccessor httpContextAccessor)
@@ -85,8 +85,8 @@ public class GeoIPService : IHostedService
             {
                 _processingReload = true;
 
-                var useGeoIP = _sinusConfiguration.GetValueOrDefault(nameof(AuthServiceConfiguration.UseGeoIP), false);
-                var cityFile = _sinusConfiguration.GetValueOrDefault(nameof(AuthServiceConfiguration.GeoIPDbCityFile), string.Empty);
+                var useGeoIP = _authServiceConfiguration.GetValueOrDefault(nameof(AuthServiceConfiguration.UseGeoIP), false);
+                var cityFile = _authServiceConfiguration.GetValueOrDefault(nameof(AuthServiceConfiguration.GeoIPDbCityFile), string.Empty);
                 DateTime lastWriteTime = DateTime.MinValue;
                 if (File.Exists(cityFile))
                 {

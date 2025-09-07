@@ -23,7 +23,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task UserAddPair(UserDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         // don't allow adding nothing
         var uid = dto.User.UID.Trim();
@@ -57,7 +57,7 @@ public partial class ServerHub
         // grab self create new client pair and save
         var user = await DbContext.Users.SingleAsync(u => u.UID == UserUID).ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
 
         ClientPair wl = new ClientPair()
         {
@@ -162,7 +162,7 @@ public partial class ServerHub
 
         await SendOnlineToAllPairedUsers().ConfigureAwait(false);
 
-        _sinusCensus.PublishStatistics(UserUID, censusData);
+        _census.PublishStatistics(UserUID, censusData);
 
         return pairs.Select(p => new OnlineUserIdentDto(new UserData(p.Key), p.Value)).ToList();
     }
@@ -186,7 +186,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task<UserProfileDto> UserGetProfile(UserDto user)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(user));
+        _logger.LogCallInfo(ServerHubLogger.Args(user));
 
         var allUserPairs = await GetAllPairedUnpausedUsers().ConfigureAwait(false);
 
@@ -207,7 +207,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task UserPushData(UserCharaDataMessageDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto.CharaData.FileReplacements.Count));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto.CharaData.FileReplacements.Count));
 
         // check for honorific containing . and /
         try
@@ -246,7 +246,7 @@ public partial class ServerHub
             bool validFileSwapPath = string.IsNullOrEmpty(replacement.FileSwapPath) || GamePathRegex().IsMatch(replacement.FileSwapPath);
             if (!validGamePaths || !validHash || !validFileSwapPath)
             {
-                _logger.LogCallWarning(SinusHubLogger.Args("Invalid Data", "GamePaths", validGamePaths, string.Join(",", invalidPaths), "Hash", validHash, replacement.Hash, "FileSwap", validFileSwapPath, replacement.FileSwapPath));
+                _logger.LogCallWarning(ServerHubLogger.Args("Invalid Data", "GamePaths", validGamePaths, string.Join(",", invalidPaths), "Hash", validHash, replacement.Hash, "FileSwap", validFileSwapPath, replacement.FileSwapPath));
                 hadInvalidData = true;
                 if (!validFileSwapPath) invalidFileSwapPaths.Add(replacement.FileSwapPath);
                 if (!validGamePaths) invalidGamePaths.AddRange(replacement.GamePaths);
@@ -277,20 +277,20 @@ public partial class ServerHub
             await _onlineSyncedPairCacheService.CachePlayers(UserUID, allPairedUsers, Context.ConnectionAborted).ConfigureAwait(false);
         }
 
-        _logger.LogCallInfo(SinusHubLogger.Args(recipientUids.Count));
+        _logger.LogCallInfo(ServerHubLogger.Args(recipientUids.Count));
 
         await Clients.Users(recipientUids).Client_UserReceiveCharacterData(new OnlineUserCharaDataDto(new UserData(UserUID), dto.CharaData)).ConfigureAwait(false);
 
-        _sinusCensus.PublishStatistics(UserUID, dto.CensusDataDto);
+        _census.PublishStatistics(UserUID, dto.CensusDataDto);
 
-        _sinusMetrics.IncCounter(MetricsAPI.CounterUserPushData);
-        _sinusMetrics.IncCounter(MetricsAPI.CounterUserPushDataTo, recipientUids.Count);
+        _metrics.IncCounter(MetricsAPI.CounterUserPushData);
+        _metrics.IncCounter(MetricsAPI.CounterUserPushDataTo, recipientUids.Count);
     }
 
     [Authorize(Policy = "Identified")]
     public async Task UserRemovePair(UserDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         if (string.Equals(dto.User.UID, UserUID, StringComparison.Ordinal)) return;
 
@@ -305,7 +305,7 @@ public partial class ServerHub
         DbContext.ClientPairs.Remove(callerPair);
         await DbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
 
         await Clients.User(UserUID).Client_UserRemoveClientPair(dto).ConfigureAwait(false);
 
@@ -343,7 +343,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task UserSetProfile(UserProfileDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         if (!string.Equals(dto.User.UID, UserUID, StringComparison.Ordinal)) throw new HubException("Cannot modify profile data for anyone but yourself");
 

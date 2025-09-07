@@ -11,11 +11,11 @@ namespace LaciSynchroni.Shared.RequirementHandlers;
 
 public class UserRequirementHandler : AuthorizationHandler<UserRequirement, HubInvocationContext>
 {
-    private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
     private readonly ILogger<UserRequirementHandler> _logger;
     private readonly IRedisDatabase _redis;
 
-    public UserRequirementHandler(IDbContextFactory<SinusDbContext> dbContextFactory, ILogger<UserRequirementHandler> logger, IRedisDatabase redisDb)
+    public UserRequirementHandler(IDbContextFactory<LaciDbContext> dbContextFactory, ILogger<UserRequirementHandler> logger, IRedisDatabase redisDb)
     {
         _dbContextFactory = dbContextFactory;
         _logger = logger;
@@ -24,7 +24,7 @@ public class UserRequirementHandler : AuthorizationHandler<UserRequirement, HubI
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, UserRequirement requirement, HubInvocationContext resource)
     {
-        var uid = context.User.Claims.SingleOrDefault(g => string.Equals(g.Type, SinusClaimTypes.Uid, StringComparison.Ordinal))?.Value;
+        var uid = context.User.Claims.SingleOrDefault(g => string.Equals(g.Type, LaciClaimTypes.Uid, StringComparison.Ordinal))?.Value;
 
         if (uid == null)
         {

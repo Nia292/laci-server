@@ -14,7 +14,7 @@ public sealed class CachedFileProvider : IDisposable
     private readonly IConfigurationService<StaticFilesServerConfiguration> _configuration;
     private readonly ILogger<CachedFileProvider> _logger;
     private readonly FileStatisticsService _fileStatisticsService;
-    private readonly SinusMetrics _metrics;
+    private readonly LaciMetrics _metrics;
     private readonly ServerTokenGenerator _generator;
     private readonly Uri _remoteCacheSourceUri;
     private readonly string _hotStoragePath;
@@ -27,7 +27,7 @@ public sealed class CachedFileProvider : IDisposable
     private bool _isDistributionServer;
 
     public CachedFileProvider(IConfigurationService<StaticFilesServerConfiguration> configuration, ILogger<CachedFileProvider> logger,
-        FileStatisticsService fileStatisticsService, SinusMetrics metrics, ServerTokenGenerator generator)
+        FileStatisticsService fileStatisticsService, LaciMetrics metrics, ServerTokenGenerator generator)
     {
         _configuration = configuration;
         _logger = logger;
@@ -38,7 +38,7 @@ public sealed class CachedFileProvider : IDisposable
         _isDistributionServer = configuration.GetValueOrDefault(nameof(StaticFilesServerConfiguration.IsDistributionNode), false);
         _hotStoragePath = configuration.GetValue<string>(nameof(StaticFilesServerConfiguration.CacheDirectory));
         _httpClient = new();
-        _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("SinusSynchronousServer", "1.0.0.0"));
+        _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("LaciSynchroni.Server", "1.0.0.0"));
         _httpClient.Timeout = TimeSpan.FromSeconds(300);
     }
 

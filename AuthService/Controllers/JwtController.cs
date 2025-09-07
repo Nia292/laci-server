@@ -16,11 +16,11 @@ namespace LaciSynchroni.AuthService.Controllers;
 public class JwtController : AuthControllerBase
 {
     public JwtController(ILogger<JwtController> logger,
-        IHttpContextAccessor accessor, IDbContextFactory<SinusDbContext> sinusDbContextFactory,
+        IHttpContextAccessor accessor, IDbContextFactory<LaciDbContext> dbContextFactory,
         SecretKeyAuthenticatorService secretKeyAuthenticatorService,
         IConfigurationService<AuthServiceConfiguration> configuration,
         IDatabase redisDb)
-            : base(logger, accessor, sinusDbContextFactory, secretKeyAuthenticatorService,
+            : base(logger, accessor, dbContextFactory, secretKeyAuthenticatorService,
                 configuration, redisDb)
     {
     }
@@ -29,7 +29,7 @@ public class JwtController : AuthControllerBase
     [HttpPost(AuthRoutes.Auth_CreateIdent)]
     public async Task<IActionResult> CreateToken(string auth, string charaIdent)
     {
-        using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
         return await AuthenticateInternal(dbContext, auth, charaIdent).ConfigureAwait(false);
     }
 
@@ -37,19 +37,19 @@ public class JwtController : AuthControllerBase
     [HttpGet(AuthRoutes.Auth_RenewToken)]
     public async Task<IActionResult> RenewToken()
     {
-        using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
         try
         {
-            var uid = HttpContext.User.Claims.Single(p => string.Equals(p.Type, SinusClaimTypes.Uid, StringComparison.Ordinal))!.Value;
-            var ident = HttpContext.User.Claims.Single(p => string.Equals(p.Type, SinusClaimTypes.CharaIdent, StringComparison.Ordinal))!.Value;
-            var alias = HttpContext.User.Claims.SingleOrDefault(p => string.Equals(p.Type, SinusClaimTypes.Alias))?.Value ?? string.Empty;
+            var uid = HttpContext.User.Claims.Single(p => string.Equals(p.Type, LaciClaimTypes.Uid, StringComparison.Ordinal))!.Value;
+            var ident = HttpContext.User.Claims.Single(p => string.Equals(p.Type, LaciClaimTypes.CharaIdent, StringComparison.Ordinal))!.Value;
+            var alias = HttpContext.User.Claims.SingleOrDefault(p => string.Equals(p.Type, LaciClaimTypes.Alias))?.Value ?? string.Empty;
 
             if (await dbContext.Auth.Where(u => u.UserUID == uid || u.PrimaryUserUID == uid).AnyAsync(a => a.MarkForBan))
             {
                 var userAuth = await dbContext.Auth.SingleAsync(u => u.UserUID == uid);
                 await EnsureBan(uid, userAuth.PrimaryUserUID, ident);
 
-                return Unauthorized("Your Sinus account is banned.");
+                return Unauthorized("Your account is banned.");
             }
 
             if (await IsIdentBanned(dbContext, ident))
@@ -67,7 +67,7 @@ public class JwtController : AuthControllerBase
         }
     }
 
-    protected async Task<IActionResult> AuthenticateInternal(SinusDbContext dbContext, string auth, string charaIdent)
+    protected async Task<IActionResult> AuthenticateInternal(LaciDbContext dbContext, string auth, string charaIdent)
     {
         try
         {

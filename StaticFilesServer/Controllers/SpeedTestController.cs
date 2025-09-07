@@ -25,7 +25,7 @@ public class SpeedTestController : ControllerBase
     [HttpGet(FilesRoutes.Speedtest_Run)]
     public async Task<IActionResult> DownloadTest(CancellationToken cancellationToken)
     {
-        var user = HttpContext.User.Claims.First(f => string.Equals(f.Type, SinusClaimTypes.Uid, StringComparison.Ordinal)).Value;
+        var user = HttpContext.User.Claims.First(f => string.Equals(f.Type, LaciClaimTypes.Uid, StringComparison.Ordinal)).Value;
         var speedtestLimit = _configurationService.GetValueOrDefault(nameof(StaticFilesServerConfiguration.SpeedTestHoursRateLimit), 0.5);
         if (_memoryCache.TryGetValue<DateTime>(user, out var value))
         {

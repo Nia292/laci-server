@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LaciSynchroni.Shared.Data;
 
-public class SinusDbContext : DbContext
+public class LaciDbContext : DbContext
 {
 #if DEBUG
-    public SinusDbContext() { }
+    public LaciDbContext() { }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -16,7 +16,7 @@ public class SinusDbContext : DbContext
             return;
         }
 
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=sinus;Username=postgres", builder =>
+        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=laci;Username=postgres", builder =>
         {
             builder.MigrationsHistoryTable("_efmigrationshistory", "public");
             builder.MigrationsAssembly("LaciSynchroni.Shared");
@@ -27,7 +27,7 @@ public class SinusDbContext : DbContext
     }
 #endif
 
-    public SinusDbContext(DbContextOptions<SinusDbContext> options) : base(options)
+    public LaciDbContext(DbContextOptions<LaciDbContext> options) : base(options)
     {
     }
 

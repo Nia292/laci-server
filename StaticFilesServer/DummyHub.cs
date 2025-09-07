@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-// this is a very hacky way to attach this file server to the main sinus hub signalr instance via redis
+// this is a very hacky way to attach this file server to the main laci hub signalr instance via redis
 // signalr publishes the namespace and hubname into the redis backend so this needs to be equal to the original
 // but I don't need to reimplement the hub completely as I only exclusively use it for internal connection calling
 // from the queue service so I keep the namespace and name of the class the same so it can connect to the same channel

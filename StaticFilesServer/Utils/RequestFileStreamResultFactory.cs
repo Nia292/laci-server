@@ -7,11 +7,11 @@ namespace LaciSynchroni.StaticFilesServer.Utils;
 
 public class RequestFileStreamResultFactory
 {
-    private readonly SinusMetrics _metrics;
+    private readonly LaciMetrics _metrics;
     private readonly RequestQueueService _requestQueueService;
     private readonly IConfigurationService<StaticFilesServerConfiguration> _configurationService;
 
-    public RequestFileStreamResultFactory(SinusMetrics metrics, RequestQueueService requestQueueService, IConfigurationService<StaticFilesServerConfiguration> configurationService)
+    public RequestFileStreamResultFactory(LaciMetrics metrics, RequestQueueService requestQueueService, IConfigurationService<StaticFilesServerConfiguration> configurationService)
     {
         _metrics = metrics;
         _requestQueueService = requestQueueService;

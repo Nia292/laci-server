@@ -2,7 +2,7 @@
 
 namespace LaciSynchroni.Shared.Services;
 
-public interface IConfigurationService<T> where T : class, ISinusConfiguration
+public interface IConfigurationService<T> where T : class, ILaciConfiguration
 {
     bool IsMain { get; }
 

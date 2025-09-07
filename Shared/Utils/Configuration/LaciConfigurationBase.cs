@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace LaciSynchroni.Shared.Utils.Configuration;
 
-public class SinusConfigurationBase : ISinusConfiguration
+public class LaciConfigurationBase : ILaciConfiguration
 {
     public int DbContextPoolSize { get; set; } = 100;
     public string Jwt { get; set; } = string.Empty;

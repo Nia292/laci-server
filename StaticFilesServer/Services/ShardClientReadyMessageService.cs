@@ -19,7 +19,7 @@ public class ShardClientReadyMessageService : IClientReadyMessageService
         _tokenGenerator = tokenGenerator;
         _configurationService = configurationService;
         _httpClient = new();
-        _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("SinusSynchronousServer", "1.0.0.0"));
+        _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("LaciSynchroni.Server", "1.0.0.0"));
     }
 
     public async Task SendDownloadReady(string uid, Guid requestId)

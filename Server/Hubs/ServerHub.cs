@@ -22,10 +22,10 @@ namespace LaciSynchroni.Server.Hubs;
 public partial class ServerHub : Hub<IServerHub>, IServerHub
 {
     private static readonly ConcurrentDictionary<string, string> _userConnections = new(StringComparer.Ordinal);
-    private readonly SinusMetrics _sinusMetrics;
+    private readonly LaciMetrics _metrics;
     private readonly SystemInfoService _systemInfoService;
     private readonly IHttpContextAccessor _contextAccessor;
-    private readonly SinusHubLogger _logger;
+    private readonly ServerHubLogger _logger;
     private readonly string _shardName;
     private readonly int _maxExistingGroupsByUser;
     private readonly int _maxJoinedGroupsByUser;
@@ -33,22 +33,22 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
     private readonly string _serverName;
     private readonly IRedisDatabase _redis;
     private readonly OnlineSyncedPairCacheService _onlineSyncedPairCacheService;
-    private readonly SinusCensus _sinusCensus;
+    private readonly LaciCensus _census;
     private readonly GPoseLobbyDistributionService _gPoseLobbyDistributionService;
     private readonly Uri _fileServerAddress;
     private readonly Version _expectedClientVersion;
-    private readonly Lazy<SinusDbContext> _dbContextLazy;
-    private SinusDbContext DbContext => _dbContextLazy.Value;
+    private readonly Lazy<LaciDbContext> _dbContextLazy;
+    private LaciDbContext DbContext => _dbContextLazy.Value;
     private readonly int _maxCharaDataByUser;
     private readonly int _maxCharaDataByUserVanity;
 
-    public ServerHub(SinusMetrics sinusMetrics,
-        IDbContextFactory<SinusDbContext> sinusDbContextFactory, ILogger<ServerHub> logger, SystemInfoService systemInfoService,
+    public ServerHub(LaciMetrics metrics,
+        IDbContextFactory<LaciDbContext> dbContextFactory, ILogger<ServerHub> logger, SystemInfoService systemInfoService,
         IConfigurationService<ServerConfiguration> configuration, IHttpContextAccessor contextAccessor,
-        IRedisDatabase redisDb, OnlineSyncedPairCacheService onlineSyncedPairCacheService, SinusCensus sinusCensus,
+        IRedisDatabase redisDb, OnlineSyncedPairCacheService onlineSyncedPairCacheService, LaciCensus census,
         GPoseLobbyDistributionService gPoseLobbyDistributionService)
     {
-        _sinusMetrics = sinusMetrics;
+        _metrics = metrics;
         _systemInfoService = systemInfoService;
         _shardName = configuration.GetValue<string>(nameof(ServerConfiguration.ShardName));
         _maxExistingGroupsByUser = configuration.GetValueOrDefault(nameof(ServerConfiguration.MaxExistingGroupsByUser), 3);
@@ -58,14 +58,14 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
         _expectedClientVersion = configuration.GetValueOrDefault(nameof(ServerConfiguration.ExpectedClientVersion), new Version(0, 0, 0));
         _maxCharaDataByUser = configuration.GetValueOrDefault(nameof(ServerConfiguration.MaxCharaDataByUser), 10);
         _maxCharaDataByUserVanity = configuration.GetValueOrDefault(nameof(ServerConfiguration.MaxCharaDataByUserVanity), 50);
-        _serverName = configuration.GetValueOrDefault(nameof(ServerConfiguration.ServerName), "Sinus Synchronous");
+        _serverName = configuration.GetValueOrDefault(nameof(ServerConfiguration.ServerName), "Laci Synchroni");
         _contextAccessor = contextAccessor;
         _redis = redisDb;
         _onlineSyncedPairCacheService = onlineSyncedPairCacheService;
-        _sinusCensus = sinusCensus;
+        _census = census;
         _gPoseLobbyDistributionService = gPoseLobbyDistributionService;
-        _logger = new SinusHubLogger(this, logger);
-        _dbContextLazy = new Lazy<SinusDbContext>(() => sinusDbContextFactory.CreateDbContext());
+        _logger = new ServerHubLogger(this, logger);
+        _dbContextLazy = new Lazy<LaciDbContext>(() => dbContextFactory.CreateDbContext());
     }
 
     protected override void Dispose(bool disposing)
@@ -83,7 +83,7 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
     {
         _logger.LogCallInfo();
 
-        _sinusMetrics.IncCounter(MetricsAPI.CounterInitializedConnections);
+        _metrics.IncCounter(MetricsAPI.CounterInitializedConnections);
 
         await Clients.Caller.Client_UpdateSystemInfo(_systemInfoService.SystemInfoDto).ConfigureAwait(false);
 
@@ -147,16 +147,16 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
     {
         if (_userConnections.TryGetValue(UserUID, out var oldId))
         {
-            _logger.LogCallWarning(SinusHubLogger.Args(_contextAccessor.GetIpAddress(), "UpdatingId", oldId, Context.ConnectionId));
+            _logger.LogCallWarning(ServerHubLogger.Args(_contextAccessor.GetIpAddress(), "UpdatingId", oldId, Context.ConnectionId));
             _userConnections[UserUID] = Context.ConnectionId;
         }
         else
         {
-            _sinusMetrics.IncGaugeWithLabels(MetricsAPI.GaugeConnections, labels: Continent);
+            _metrics.IncGaugeWithLabels(MetricsAPI.GaugeConnections, labels: Continent);
 
             try
             {
-                _logger.LogCallInfo(SinusHubLogger.Args(_contextAccessor.GetIpAddress(), Context.ConnectionId, UserCharaIdent));
+                _logger.LogCallInfo(ServerHubLogger.Args(_contextAccessor.GetIpAddress(), Context.ConnectionId, UserCharaIdent));
                 await _onlineSyncedPairCacheService.InitPlayer(UserUID).ConfigureAwait(false);
                 await UpdateUserOnRedis().ConfigureAwait(false);
                 _userConnections[UserUID] = Context.ConnectionId;
@@ -176,7 +176,7 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
         if (_userConnections.TryGetValue(UserUID, out var connectionId)
             && string.Equals(connectionId, Context.ConnectionId, StringComparison.Ordinal))
         {
-            _sinusMetrics.DecGaugeWithLabels(MetricsAPI.GaugeConnections, labels: Continent);
+            _metrics.DecGaugeWithLabels(MetricsAPI.GaugeConnections, labels: Continent);
 
             try
             {
@@ -184,13 +184,13 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
 
                 await _onlineSyncedPairCacheService.DisposePlayer(UserUID).ConfigureAwait(false);
 
-                _logger.LogCallInfo(SinusHubLogger.Args(_contextAccessor.GetIpAddress(), Context.ConnectionId, UserCharaIdent));
+                _logger.LogCallInfo(ServerHubLogger.Args(_contextAccessor.GetIpAddress(), Context.ConnectionId, UserCharaIdent));
                 if (exception != null)
-                    _logger.LogCallWarning(SinusHubLogger.Args(_contextAccessor.GetIpAddress(), Context.ConnectionId, exception.Message, exception.StackTrace));
+                    _logger.LogCallWarning(ServerHubLogger.Args(_contextAccessor.GetIpAddress(), Context.ConnectionId, exception.Message, exception.StackTrace));
 
                 await RemoveUserFromRedis().ConfigureAwait(false);
 
-                _sinusCensus.ClearStatistics(UserUID);
+                _census.ClearStatistics(UserUID);
 
                 await SendOfflineToAllPairedUsers().ConfigureAwait(false);
 
@@ -206,7 +206,7 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
         }
         else
         {
-            _logger.LogCallWarning(SinusHubLogger.Args(_contextAccessor.GetIpAddress(), "ObsoleteId", UserUID, Context.ConnectionId));
+            _logger.LogCallWarning(ServerHubLogger.Args(_contextAccessor.GetIpAddress(), "ObsoleteId", UserUID, Context.ConnectionId));
         }
 
         await base.OnDisconnectedAsync(exception).ConfigureAwait(false);

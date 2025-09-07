@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace LaciSynchroni.Shared.Migrations
 {
-    [DbContext(typeof(SinusDbContext))]
+    [DbContext(typeof(LaciDbContext))]
     [Migration("20241228190750_ManipData")]
     partial class ManipData
     {

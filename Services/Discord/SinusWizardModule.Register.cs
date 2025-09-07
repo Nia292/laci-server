@@ -8,7 +8,7 @@ using LaciSynchroni.Shared.Utils.Configuration;
 
 namespace LaciSynchroni.Services.Discord;
 
-public partial class SinusWizardModule
+public partial class LaciWizardModule
 {
     [ComponentInteraction("wizard-register")]
     public async Task ComponentRegister()
@@ -17,7 +17,7 @@ public partial class SinusWizardModule
 
         _logger.LogInformation("{method}:{userId}", nameof(ComponentRegister), Context.Interaction.User.Id);
 
-        var serverName = _sinusServicesConfiguration.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Sinus Synchronous");
+        var serverName = _servicesConfig.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Laci Synchroni");
 
         EmbedBuilder eb = new();
         eb.WithColor(Color.Blue);
@@ -102,13 +102,13 @@ public partial class SinusWizardModule
         ComponentBuilder cb = new();
         bool registerSuccess = false;
 
-        var isRegistrationLocked = _sinusServicesConfiguration.GetValueOrDefault(nameof(ServicesConfiguration.LockRegistrationToRole), false);
-        var serverName = _sinusServicesConfiguration.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Sinus Synchronous");
+        var isRegistrationLocked = _servicesConfig.GetValueOrDefault(nameof(ServicesConfiguration.LockRegistrationToRole), false);
+        var serverName = _servicesConfig.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Laci Synchroni");
 
         if (isRegistrationLocked)
         {
             bool hasAccess = false;
-            var registrationRole = _sinusServicesConfiguration.GetValueOrDefault<ulong?>(nameof(ServicesConfiguration.DiscordRegistrationRole), null!);
+            var registrationRole = _servicesConfig.GetValueOrDefault<ulong?>(nameof(ServicesConfiguration.DiscordRegistrationRole), null!);
             if (registrationRole == null)
             {
                 eb.WithColor(Color.Red);
@@ -145,11 +145,11 @@ public partial class SinusWizardModule
         eb.WithTitle($"Registration successful, your UID: {uid}");
         eb.WithDescription("This is your private secret key. Do not share this private secret key with anyone. **If you lose it, it is irrevocably lost.**"
                                      + Environment.NewLine + Environment.NewLine
-                                     + "**__NOTE: Secret keys are considered legacy. Using the suggested OAuth2 authentication in Sinus, you do not need to use this Secret Key.__**"
+                                     + "**__NOTE: Secret keys are considered legacy. Using the suggested OAuth2 authentication in Laci, you do not need to use this Secret Key.__**"
                                      + Environment.NewLine + Environment.NewLine
                                      + $"||**`{key}`**||"
                                      + Environment.NewLine + Environment.NewLine
-                                     + "If you want to continue using legacy authentication, enter this key in Sinus Synchronous and hit save to connect to the service."
+                                     + "If you want to continue using legacy authentication, enter this key in Laci Synchroni and hit save to connect to the service."
                                      + Environment.NewLine
                                      + "__NOTE: The Secret Key only contains the letters ABCDEF and numbers 0 - 9.__"
                                      + Environment.NewLine
@@ -203,9 +203,9 @@ public partial class SinusWizardModule
                               + Environment.NewLine + Environment.NewLine
                               + $"**`{lodestoneAuth}`**"
                               + Environment.NewLine + Environment.NewLine
-                              + $"**! THIS IS NOT THE KEY YOU HAVE TO ENTER IN SINUS !**"
+                              + $"**! THIS IS NOT THE KEY YOU HAVE TO ENTER IN LACI !**"
                               + Environment.NewLine + Environment.NewLine
-                              + "Once added and saved, use the button below to Verify and finish registration and receive a secret key to use for Sinus Synchronous."
+                              + "Once added and saved, use the button below to Verify and finish registration and receive a secret key to use for Laci Synchroni."
                               + Environment.NewLine
                               + "__You can delete the entry from your profile after verification.__"
                               + Environment.NewLine + Environment.NewLine
@@ -252,7 +252,7 @@ public partial class SinusWizardModule
         }
     }
 
-    private async Task<(string, string)> HandleAddUser(SinusDbContext db)
+    private async Task<(string, string)> HandleAddUser(LaciDbContext db)
     {
         var lodestoneAuth = db.LodeStoneAuth.SingleOrDefault(u => u.DiscordId == Context.User.Id);
 
@@ -269,7 +269,7 @@ public partial class SinusWizardModule
 
         var user = new User();
 
-        var uidLength = _sinusServicesConfiguration.GetValueOrDefault(nameof(ServicesConfiguration.UidLength), 10);
+        var uidLength = _servicesConfig.GetValueOrDefault(nameof(ServicesConfiguration.UidLength), 10);
 
         var hasValidUid = false;
         while (!hasValidUid)

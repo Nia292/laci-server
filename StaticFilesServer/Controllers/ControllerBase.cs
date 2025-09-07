@@ -12,7 +12,7 @@ public class ControllerBase : Controller
         _logger = logger;
     }
 
-    protected string SinusUser => HttpContext.User.Claims.First(f => string.Equals(f.Type, SinusClaimTypes.Uid, StringComparison.Ordinal)).Value;
-    protected string Continent => HttpContext.User.Claims.FirstOrDefault(f => string.Equals(f.Type, SinusClaimTypes.Continent, StringComparison.Ordinal))?.Value ?? "*";
-    protected bool IsPriority => !string.IsNullOrEmpty(HttpContext.User.Claims.FirstOrDefault(f => string.Equals(f.Type, SinusClaimTypes.Alias, StringComparison.Ordinal))?.Value ?? string.Empty);
+    protected string LaciUser => HttpContext.User.Claims.First(f => string.Equals(f.Type, LaciClaimTypes.Uid, StringComparison.Ordinal)).Value;
+    protected string Continent => HttpContext.User.Claims.FirstOrDefault(f => string.Equals(f.Type, LaciClaimTypes.Continent, StringComparison.Ordinal))?.Value ?? "*";
+    protected bool IsPriority => !string.IsNullOrEmpty(HttpContext.User.Claims.FirstOrDefault(f => string.Equals(f.Type, LaciClaimTypes.Alias, StringComparison.Ordinal))?.Value ?? string.Empty);
 }

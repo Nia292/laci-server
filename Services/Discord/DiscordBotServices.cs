@@ -28,7 +28,7 @@ public class DiscordBotServices
     private ulong? _logChannelId;
     private RestTextChannel? _logChannel;
 
-    public DiscordBotServices(ILogger<DiscordBotServices> logger, SinusMetrics metrics,
+    public DiscordBotServices(ILogger<DiscordBotServices> logger, LaciMetrics metrics,
         IConfigurationService<ServicesConfiguration> configuration)
     {
         Logger = logger;
@@ -37,7 +37,7 @@ public class DiscordBotServices
     }
 
     public ILogger<DiscordBotServices> Logger { get; init; }
-    public SinusMetrics Metrics { get; init; }
+    public LaciMetrics Metrics { get; init; }
     public ConcurrentQueue<KeyValuePair<ulong, Func<DiscordBotServices, Task>>> VerificationQueue { get; } = new();
 
     public Task Start()

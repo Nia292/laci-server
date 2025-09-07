@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LaciSynchroni.Services.Discord;
 
-public partial class SinusWizardModule
+public partial class LaciWizardModule
 {
     [ComponentInteraction("wizard-delete")]
     public async Task ComponentDelete()
@@ -16,7 +16,7 @@ public partial class SinusWizardModule
 
         _logger.LogInformation("{method}:{userId}", nameof(ComponentDelete), Context.Interaction.User.Id);
 
-        using var sinusDb = await GetDbContext().ConfigureAwait(false);
+        using var db = await GetDbContext().ConfigureAwait(false);
         EmbedBuilder eb = new();
         eb.WithTitle("Delete Account");
         eb.WithDescription("You can delete your primary or secondary UIDs here." + Environment.NewLine + Environment.NewLine
@@ -27,7 +27,7 @@ public partial class SinusWizardModule
         eb.WithColor(Color.Blue);
 
         ComponentBuilder cb = new();
-        await AddUserSelection(sinusDb, cb, "wizard-delete-select").ConfigureAwait(false);
+        await AddUserSelection(db, cb, "wizard-delete-select").ConfigureAwait(false);
         AddHome(cb);
         await ModifyInteraction(eb, cb).ConfigureAwait(false);
     }
@@ -39,8 +39,8 @@ public partial class SinusWizardModule
 
         _logger.LogInformation("{method}:{userId}:{uid}", nameof(SelectionDeleteAccount), Context.Interaction.User.Id, uid);
 
-        using var sinusDb = await GetDbContext().ConfigureAwait(false);
-        bool isPrimary = sinusDb.Auth.Single(u => u.UserUID == uid).PrimaryUserUID == null;
+        using var db = await GetDbContext().ConfigureAwait(false);
+        bool isPrimary = db.Auth.Single(u => u.UserUID == uid).PrimaryUserUID == null;
         EmbedBuilder eb = new();
         eb.WithTitle($"Are you sure you want to delete {uid}?");
         eb.WithDescription($"This operation is irreversible. All your pairs, joined syncshells and information stored on the service for {uid} will be " +
@@ -87,7 +87,7 @@ public partial class SinusWizardModule
             }
             else
             {
-                var maxGroupsByUser = _sinusClientConfigurationService.GetValueOrDefault(nameof(ServerConfiguration.MaxGroupUserCount), 3);
+                var maxGroupsByUser = _serverConfig.GetValueOrDefault(nameof(ServerConfiguration.MaxGroupUserCount), 3);
 
                 using var db = await GetDbContext().ConfigureAwait(false);
                 var user = await db.Users.SingleAsync(u => u.UID == uid).ConfigureAwait(false);

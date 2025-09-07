@@ -5,13 +5,13 @@ namespace LaciSynchroni.StaticFilesServer.Services;
 
 public class FileStatisticsService : IHostedService
 {
-    private readonly SinusMetrics _metrics;
+    private readonly LaciMetrics _metrics;
     private readonly ILogger<FileStatisticsService> _logger;
     private CancellationTokenSource _resetCancellationTokenSource;
     private ConcurrentDictionary<string, long> _pastHourFiles = new(StringComparer.Ordinal);
     private ConcurrentDictionary<string, long> _pastDayFiles = new(StringComparer.Ordinal);
 
-    public FileStatisticsService(SinusMetrics metrics, ILogger<FileStatisticsService> logger)
+    public FileStatisticsService(LaciMetrics metrics, ILogger<FileStatisticsService> logger)
     {
         _metrics = metrics;
         _logger = logger;

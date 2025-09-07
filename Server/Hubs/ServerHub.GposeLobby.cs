@@ -24,9 +24,9 @@ public partial class ServerHub
 
     private async Task AddUserToLobby(string lobbyId, List<string> priorUsers)
     {
-        _sinusMetrics.IncGauge(MetricsAPI.GaugeGposeLobbyUsers);
+        _metrics.IncGauge(MetricsAPI.GaugeGposeLobbyUsers);
         if (priorUsers.Count == 0)
-            _sinusMetrics.IncGauge(MetricsAPI.GaugeGposeLobbies);
+            _metrics.IncGauge(MetricsAPI.GaugeGposeLobbies);
 
         await _redis.AddAsync(GposeLobbyUser, lobbyId).ConfigureAwait(false);
         await _redis.AddAsync($"GposeLobby:{lobbyId}", priorUsers.Concat([UserUID])).ConfigureAwait(false);
@@ -36,12 +36,12 @@ public partial class ServerHub
     {
         await _redis.RemoveAsync(GposeLobbyUser).ConfigureAwait(false);
 
-        _sinusMetrics.DecGauge(MetricsAPI.GaugeGposeLobbyUsers);
+        _metrics.DecGauge(MetricsAPI.GaugeGposeLobbyUsers);
 
         if (priorUsers.Count == 1)
         {
             await _redis.RemoveAsync($"GposeLobby:{lobbyId}").ConfigureAwait(false);
-            _sinusMetrics.DecGauge(MetricsAPI.GaugeGposeLobbies);
+            _metrics.DecGauge(MetricsAPI.GaugeGposeLobbies);
         }
         else
         {

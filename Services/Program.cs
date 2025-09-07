@@ -14,9 +14,9 @@ public class Program
             var options = host.Services.GetService<IConfigurationService<ServicesConfiguration>>();
             var optionsServer = host.Services.GetService<IConfigurationService<ServerConfiguration>>();
             var logger = host.Services.GetService<ILogger<Program>>();
-            logger.LogInformation("Loaded SinusSynchronous Services Configuration (IsMain: {isMain})", options.IsMain);
+            logger.LogInformation("Loaded LaciSynchroni Services Configuration (IsMain: {isMain})", options.IsMain);
             logger.LogInformation(options.ToString());
-            logger.LogInformation("Loaded SinusSynchronous Server Configuration (IsMain: {isMain})", optionsServer.IsMain);
+            logger.LogInformation("Loaded LaciSynchroni Server Configuration (IsMain: {isMain})", optionsServer.IsMain);
             logger.LogInformation(optionsServer.ToString());
         }
 

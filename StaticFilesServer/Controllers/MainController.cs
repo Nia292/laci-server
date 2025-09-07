@@ -13,10 +13,10 @@ public class MainController : ControllerBase
     private readonly IClientReadyMessageService _messageService;
     private readonly MainServerShardRegistrationService _shardRegistrationService;
 
-    public MainController(ILogger<MainController> logger, IClientReadyMessageService sinusHub,
+    public MainController(ILogger<MainController> logger, IClientReadyMessageService hub,
         MainServerShardRegistrationService shardRegistrationService) : base(logger)
     {
-        _messageService = sinusHub;
+        _messageService = hub;
         _shardRegistrationService = shardRegistrationService;
     }
 
@@ -32,12 +32,12 @@ public class MainController : ControllerBase
     {
         try
         {
-            _shardRegistrationService.RegisterShard(SinusUser, shardConfiguration);
+            _shardRegistrationService.RegisterShard(LaciUser, shardConfiguration);
             return Ok();
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Shard could not be registered {shard}", SinusUser);
+            _logger.LogWarning(ex, "Shard could not be registered {shard}", LaciUser);
             return BadRequest();
         }
     }
@@ -45,7 +45,7 @@ public class MainController : ControllerBase
     [HttpPost("shardUnregister")]
     public IActionResult UnregisterShard()
     {
-        _shardRegistrationService.UnregisterShard(SinusUser);
+        _shardRegistrationService.UnregisterShard(LaciUser);
         return Ok();
     }
 
@@ -54,12 +54,12 @@ public class MainController : ControllerBase
     {
         try
         {
-            _shardRegistrationService.ShardHeartbeat(SinusUser);
+            _shardRegistrationService.ShardHeartbeat(LaciUser);
             return Ok();
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Shard not registered: {shard}", SinusUser);
+            _logger.LogWarning(ex, "Shard not registered: {shard}", LaciUser);
             return BadRequest();
         }
     }

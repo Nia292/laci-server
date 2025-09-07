@@ -10,18 +10,18 @@ namespace LaciSynchroni.Server.Services;
 
 public class UserCleanupService : IHostedService
 {
-    private readonly SinusMetrics metrics;
+    private readonly LaciMetrics _metrics;
     private readonly ILogger<UserCleanupService> _logger;
-    private readonly IDbContextFactory<SinusDbContext> _sinusDbContextFactory;
-    private readonly IConfigurationService<ServerConfiguration> _configuration;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
+    private readonly IConfigurationService<ServerConfiguration> _config;
     private CancellationTokenSource _cleanupCts;
 
-    public UserCleanupService(SinusMetrics metrics, ILogger<UserCleanupService> logger, IDbContextFactory<SinusDbContext> sinusDbContextFactory, IConfigurationService<ServerConfiguration> configuration)
+    public UserCleanupService(LaciMetrics metrics, ILogger<UserCleanupService> logger, IDbContextFactory<LaciDbContext> dbContextFactory, IConfigurationService<ServerConfiguration> config)
     {
-        this.metrics = metrics;
+        _metrics = metrics;
         _logger = logger;
-        _sinusDbContextFactory = sinusDbContextFactory;
-        _configuration = configuration;
+        _dbContextFactory = dbContextFactory;
+        _config = config;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -38,7 +38,7 @@ public class UserCleanupService : IHostedService
     {
         while (!ct.IsCancellationRequested)
         {
-            using (var dbContext = await _sinusDbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false))
+            using (var dbContext = await _dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false))
             {
 
                 CleanUpOutdatedLodestoneAuths(dbContext);
@@ -60,7 +60,7 @@ public class UserCleanupService : IHostedService
         }
     }
 
-    private async Task PurgeTempInvites(SinusDbContext dbContext)
+    private async Task PurgeTempInvites(LaciDbContext dbContext)
     {
         try
         {
@@ -73,14 +73,14 @@ public class UserCleanupService : IHostedService
         }
     }
 
-    private async Task PurgeUnusedAccounts(SinusDbContext dbContext)
+    private async Task PurgeUnusedAccounts(LaciDbContext dbContext)
     {
         try
         {
-            if (_configuration.GetValueOrDefault(nameof(ServerConfiguration.PurgeUnusedAccounts), false))
+            if (_config.GetValueOrDefault(nameof(ServerConfiguration.PurgeUnusedAccounts), false))
             {
-                var usersOlderThanDays = _configuration.GetValueOrDefault(nameof(ServerConfiguration.PurgeUnusedAccountsPeriodInDays), 14);
-                var maxGroupsByUser = _configuration.GetValueOrDefault(nameof(ServerConfiguration.MaxGroupUserCount), 3);
+                var usersOlderThanDays = _config.GetValueOrDefault(nameof(ServerConfiguration.PurgeUnusedAccountsPeriodInDays), 14);
+                var maxGroupsByUser = _config.GetValueOrDefault(nameof(ServerConfiguration.MaxGroupUserCount), 3);
 
                 _logger.LogInformation("Cleaning up users older than {usersOlderThanDays} days", usersOlderThanDays);
 
@@ -107,7 +107,7 @@ public class UserCleanupService : IHostedService
         }
     }
 
-    private void CleanUpOutdatedLodestoneAuths(SinusDbContext dbContext)
+    private void CleanUpOutdatedLodestoneAuths(LaciDbContext dbContext)
     {
         try
         {
@@ -131,7 +131,7 @@ public class UserCleanupService : IHostedService
         }
     }
 
-    public async Task PurgeUser(User user, SinusDbContext dbContext)
+    public async Task PurgeUser(User user, LaciDbContext dbContext)
     {
         _logger.LogInformation("Purging user: {uid}", user.UID);
 
@@ -170,7 +170,7 @@ public class UserCleanupService : IHostedService
                 }
                 else
                 {
-                    _ = await SharedDbFunctions.MigrateOrDeleteGroup(dbContext, userGroupPair.Group, groupPairs, _configuration.GetValueOrDefault(nameof(ServerConfiguration.MaxExistingGroupsByUser), 3)).ConfigureAwait(false);
+                    _ = await SharedDbFunctions.MigrateOrDeleteGroup(dbContext, userGroupPair.Group, groupPairs, _config.GetValueOrDefault(nameof(ServerConfiguration.MaxExistingGroupsByUser), 3)).ConfigureAwait(false);
                 }
             }
 

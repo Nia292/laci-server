@@ -2,7 +2,7 @@
 
 namespace LaciSynchroni.Shared.Utils.Configuration;
 
-public class StaticFilesServerConfiguration : SinusConfigurationBase
+public class StaticFilesServerConfiguration : LaciConfigurationBase
 {
     public bool IsDistributionNode { get; set; } = false;
     public Uri MainFileServerAddress { get; set; } = null;

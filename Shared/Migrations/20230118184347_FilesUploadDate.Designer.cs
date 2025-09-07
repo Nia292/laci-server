@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace LaciSynchroni.Shared.Migrations
 {
-    [DbContext(typeof(SinusDbContext))]
+    [DbContext(typeof(LaciDbContext))]
     [Migration("20230118184347_FilesUploadDate")]
     partial class FilesUploadDate
     {

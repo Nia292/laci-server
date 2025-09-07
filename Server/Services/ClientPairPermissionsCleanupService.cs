@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace LaciSynchroni.Server.Services;
 
-public class ClientPairPermissionsCleanupService(ILogger<ClientPairPermissionsCleanupService> _logger, IDbContextFactory<SinusDbContext> _dbContextFactory,
+public class ClientPairPermissionsCleanupService(ILogger<ClientPairPermissionsCleanupService> _logger, IDbContextFactory<LaciDbContext> _dbContextFactory,
     IConfigurationService<ServerConfiguration> _configurationService)
     : BackgroundService
 {
@@ -120,7 +120,7 @@ public class ClientPairPermissionsCleanupService(ILogger<ClientPairPermissionsCl
         _logger.LogInformation("User Permissions Cleanup Finished, removed {total} stale permissions in {time}", removedEntries, st.Elapsed);
     }
 
-    private async Task<List<UserPermissionSet>> UserPermissionCleanup(int userNr, int totalUsers, string uid, SinusDbContext dbContext, List<string> pairs)
+    private async Task<List<UserPermissionSet>> UserPermissionCleanup(int userNr, int totalUsers, string uid, LaciDbContext dbContext, List<string> pairs)
     {
         var perms = dbContext.Permissions.Where(p => p.UserUID == uid && !p.Sticky && !pairs.Contains(p.OtherUserUID));
 
@@ -133,7 +133,7 @@ public class ClientPairPermissionsCleanupService(ILogger<ClientPairPermissionsCl
         return await perms.ToListAsync().ConfigureAwait(false);
     }
 
-    private async Task<List<string>> GetAllPairsForUser(string uid, SinusDbContext dbContext, CancellationToken ct)
+    private async Task<List<string>> GetAllPairsForUser(string uid, LaciDbContext dbContext, CancellationToken ct)
     {
         var entries = await dbContext.ClientPairs.AsNoTracking().Where(k => k.UserUID == uid).Select(k => k.OtherUserUID)
             .Concat(

@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace LaciSynchroni.Server.Services;
 
-public class SinusCensus : IHostedService
+public class LaciCensus : IHostedService
 {
     private record CensusEntry(ushort WorldId, short Race, short Subrace, short Gender)
     {
@@ -19,13 +19,13 @@ public class SinusCensus : IHostedService
     private readonly ConcurrentDictionary<string, CensusEntry> _censusEntries = new(StringComparer.Ordinal);
     private readonly Dictionary<short, string> _dcs = new();
     private readonly Dictionary<short, string> _gender = new();
-    private readonly ILogger<SinusCensus> _logger;
+    private readonly ILogger<LaciCensus> _logger;
     private readonly Dictionary<short, string> _races = new();
     private readonly Dictionary<short, string> _tribes = new();
     private readonly Dictionary<ushort, (string, short)> _worlds = new();
     private Gauge? _gauge;
 
-    public SinusCensus(ILogger<SinusCensus> logger)
+    public LaciCensus(ILogger<LaciCensus> logger)
     {
         _logger = logger;
     }
@@ -157,7 +157,7 @@ public class SinusCensus : IHostedService
         _gender[0] = "Male";
         _gender[1] = "Female";
 
-        _gauge = Metrics.CreateGauge("sinus_census", "sinus informational census data", new[] { "dc", "world", "gender", "race", "subrace" });
+        _gauge = Metrics.CreateGauge("laci_census", "laci informational census data", new[] { "dc", "world", "gender", "race", "subrace" });
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

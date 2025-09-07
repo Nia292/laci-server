@@ -16,7 +16,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task GroupBanUser(GroupPairDto dto, string reason)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, reason));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, reason));
 
         var (userHasRights, group) = await TryValidateGroupModeratorOrOwner(dto.Group.GID).ConfigureAwait(false);
         if (!userHasRights) return;
@@ -41,13 +41,13 @@ public partial class ServerHub
 
         await GroupRemoveUser(dto).ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
     }
 
     [Authorize(Policy = "Identified")]
     public async Task GroupChangeGroupPermissionState(GroupPermissionDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (hasRights, group) = await TryValidateGroupModeratorOrOwner(dto.Group.GID).ConfigureAwait(false);
         if (!hasRights) return;
@@ -66,7 +66,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task GroupChangeOwnership(GroupPairDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (isOwner, group) = await TryValidateOwner(dto.Group.GID).ConfigureAwait(false);
         if (!isOwner) return;
@@ -85,7 +85,7 @@ public partial class ServerHub
         newOwnerPair.IsModerator = false;
         await DbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
 
         var groupPairs = await DbContext.GroupPairs.Where(p => p.GroupGID == dto.Group.GID).Select(p => p.GroupUserUID).AsNoTracking().ToListAsync().ConfigureAwait(false);
 
@@ -95,12 +95,12 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task<bool> GroupChangePassword(GroupPasswordDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (isOwner, group) = await TryValidateOwner(dto.Group.GID).ConfigureAwait(false);
         if (!isOwner || dto.Password.Length < 10) return false;
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
 
         group.HashedPassword = StringUtils.Sha256String(dto.Password);
         await DbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -111,7 +111,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task GroupClear(GroupDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (hasRights, group) = await TryValidateGroupModeratorOrOwner(dto.Group.GID).ConfigureAwait(false);
         if (!hasRights) return;
@@ -121,7 +121,7 @@ public partial class ServerHub
 
         await Clients.Users(notPinned.Select(g => g.GroupUserUID)).Client_GroupDelete(new GroupDto(group.ToGroupData())).ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
 
         DbContext.GroupPairs.RemoveRange(notPinned);
 
@@ -209,7 +209,7 @@ public partial class ServerHub
             newGroup.ToEnum(), initialPrefPermissions.ToEnum(), initialPair.ToEnum(), new(StringComparer.Ordinal)))
             .ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(gid));
+        _logger.LogCallInfo(ServerHubLogger.Args(gid));
 
         return new GroupJoinDto(newGroup.ToGroupData(), passwd, initialPrefPermissions.ToEnum());
     }
@@ -217,7 +217,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task<List<string>> GroupCreateTempInvite(GroupDto dto, int amount)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, amount));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, amount));
         List<string> inviteCodes = new();
         List<GroupTempInvite> tempInvites = new();
         var (hasRights, group) = await TryValidateGroupModeratorOrOwner(dto.Group.GID).ConfigureAwait(false);
@@ -256,11 +256,11 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task GroupDelete(GroupDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (hasRights, group) = await TryValidateOwner(dto.Group.GID).ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
 
         var groupPairs = await DbContext.GroupPairs.Where(p => p.GroupGID == dto.Group.GID).ToListAsync().ConfigureAwait(false);
         DbContext.RemoveRange(groupPairs);
@@ -275,7 +275,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task<List<BannedGroupUserDto>> GroupGetBannedUsers(GroupDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (userHasRights, group) = await TryValidateGroupModeratorOrOwner(dto.GID).ConfigureAwait(false);
         if (!userHasRights) return new List<BannedGroupUserDto>();
@@ -286,7 +286,7 @@ public partial class ServerHub
             new BannedGroupUserDto(group.ToGroupData(), b.BannedUser.ToUserData(), b.BannedReason, b.BannedOn,
                 b.BannedByUID)).ToList();
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, bannedGroupUsers.Count));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, bannedGroupUsers.Count));
 
         return bannedGroupUsers;
     }
@@ -296,7 +296,7 @@ public partial class ServerHub
     {
         var aliasOrGid = dto.Group.GID.Trim();
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var group = await DbContext.Groups.Include(g => g.Owner).AsNoTracking().SingleOrDefaultAsync(g => g.GID == aliasOrGid || g.Alias == aliasOrGid).ConfigureAwait(false);
         var groupGid = group?.GID ?? string.Empty;
@@ -324,7 +324,7 @@ public partial class ServerHub
     {
         var aliasOrGid = dto.Group.GID.Trim();
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var group = await DbContext.Groups.Include(g => g.Owner).AsNoTracking().SingleOrDefaultAsync(g => g.GID == aliasOrGid || g.Alias == aliasOrGid).ConfigureAwait(false);
         var groupGid = group?.GID ?? string.Empty;
@@ -349,7 +349,7 @@ public partial class ServerHub
 
         if (oneTimeInvite != null)
         {
-            _logger.LogCallInfo(SinusHubLogger.Args(aliasOrGid, "TempInvite", oneTimeInvite.Invite));
+            _logger.LogCallInfo(ServerHubLogger.Args(aliasOrGid, "TempInvite", oneTimeInvite.Invite));
             DbContext.Remove(oneTimeInvite);
         }
 
@@ -386,7 +386,7 @@ public partial class ServerHub
 
         await DbContext.GroupPairs.AddAsync(newPair).ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(aliasOrGid, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(aliasOrGid, "Success"));
 
         await DbContext.SaveChangesAsync().ConfigureAwait(false);
 
@@ -532,7 +532,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task<int> GroupPrune(GroupDto dto, int days, bool execute)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, days, execute));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, days, execute));
 
         var (hasRights, group) = await TryValidateGroupModeratorOrOwner(dto.Group.GID).ConfigureAwait(false);
         if (!hasRights) return -1;
@@ -563,7 +563,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task GroupRemoveUser(GroupPairDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (hasRights, group) = await TryValidateGroupModeratorOrOwner(dto.Group.GID).ConfigureAwait(false);
         if (!hasRights) return;
@@ -572,7 +572,7 @@ public partial class ServerHub
         if (!userExists) return;
 
         if (groupPair.IsModerator || string.Equals(group.OwnerUID, dto.User.UID, StringComparison.Ordinal)) return;
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
 
         DbContext.GroupPairs.Remove(groupPair);
 
@@ -603,7 +603,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task GroupSetUserInfo(GroupPairUserInfoDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (userExists, userPair) = await TryValidateUserInGroup(dto.Group.GID, dto.User.UID).ConfigureAwait(false);
         if (!userExists) return;
@@ -656,7 +656,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task GroupUnbanUser(GroupPairDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (userHasRights, _) = await TryValidateGroupModeratorOrOwner(dto.Group.GID).ConfigureAwait(false);
         if (!userHasRights) return;
@@ -667,6 +667,6 @@ public partial class ServerHub
         DbContext.Remove(banEntry);
         await DbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
     }
 }

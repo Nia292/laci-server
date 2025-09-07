@@ -11,10 +11,10 @@ public class ShardFileCleanupService : IHostedService
     private readonly string _cacheDir;
     private readonly IConfigurationService<StaticFilesServerConfiguration> _configuration;
     private readonly ILogger<MainFileCleanupService> _logger;
-    private readonly SinusMetrics _metrics;
+    private readonly LaciMetrics _metrics;
     private CancellationTokenSource _cleanupCts;
 
-    public ShardFileCleanupService(SinusMetrics metrics, ILogger<MainFileCleanupService> logger, IConfigurationService<StaticFilesServerConfiguration> configuration)
+    public ShardFileCleanupService(LaciMetrics metrics, ILogger<MainFileCleanupService> logger, IConfigurationService<StaticFilesServerConfiguration> configuration)
     {
         _metrics = metrics;
         _logger = logger;

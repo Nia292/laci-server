@@ -11,13 +11,13 @@ namespace LaciSynchroni.AuthService.Services;
 
 public class SecretKeyAuthenticatorService
 {
-    private readonly SinusMetrics _metrics;
-    private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;
+    private readonly LaciMetrics _metrics;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
     private readonly IConfigurationService<AuthServiceConfiguration> _configurationService;
     private readonly ILogger<SecretKeyAuthenticatorService> _logger;
     private readonly ConcurrentDictionary<string, SecretKeyFailedAuthorization> _failedAuthorizations = new(StringComparer.Ordinal);
 
-    public SecretKeyAuthenticatorService(SinusMetrics metrics, IDbContextFactory<SinusDbContext> dbContextFactory,
+    public SecretKeyAuthenticatorService(LaciMetrics metrics, IDbContextFactory<LaciDbContext> dbContextFactory,
         IConfigurationService<AuthServiceConfiguration> configuration, ILogger<SecretKeyAuthenticatorService> logger)
     {
         _logger = logger;
@@ -55,7 +55,7 @@ public class SecretKeyAuthenticatorService
         return await GetAuthReply(ip, context, authReply).ConfigureAwait(false);
     }
 
-    private async Task<SecretKeyAuthReply> GetAuthReply(string ip, SinusDbContext context, Auth? authReply)
+    private async Task<SecretKeyAuthReply> GetAuthReply(string ip, LaciDbContext context, Auth? authReply)
     {
         var isBanned = authReply?.IsBanned ?? false;
         var markedForBan = authReply?.MarkForBan ?? false;

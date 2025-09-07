@@ -6,9 +6,9 @@ namespace LaciSynchroni.Server.Services;
 public class CharaDataCleanupService : BackgroundService
 {
     private readonly ILogger<CharaDataCleanupService> _logger;
-    private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
 
-    public CharaDataCleanupService(ILogger<CharaDataCleanupService> logger, IDbContextFactory<SinusDbContext> dbContextFactory)
+    public CharaDataCleanupService(ILogger<CharaDataCleanupService> logger, IDbContextFactory<LaciDbContext> dbContextFactory)
     {
         _logger = logger;
         _dbContextFactory = dbContextFactory;

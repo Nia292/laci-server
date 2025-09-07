@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LaciSynchroni.Services.Discord;
 
-public partial class SinusWizardModule
+public partial class LaciWizardModule
 {
     [ComponentInteraction("wizard-userinfo")]
     public async Task ComponentUserinfo()
@@ -14,7 +14,7 @@ public partial class SinusWizardModule
 
         _logger.LogInformation("{method}:{userId}", nameof(ComponentUserinfo), Context.Interaction.User.Id);
 
-        using var sinusDb = await GetDbContext().ConfigureAwait(false);
+        using var db = await GetDbContext().ConfigureAwait(false);
         EmbedBuilder eb = new();
         eb.WithTitle("User Info");
         eb.WithColor(Color.Blue);
@@ -24,7 +24,7 @@ public partial class SinusWizardModule
             + "- 2️⃣ are all your secondary accounts/UIDs" + Environment.NewLine
             + "If you are using Vanity UIDs the original UID is displayed in the second line of the account selection.");
         ComponentBuilder cb = new();
-        await AddUserSelection(sinusDb, cb, "wizard-userinfo-select").ConfigureAwait(false);
+        await AddUserSelection(db, cb, "wizard-userinfo-select").ConfigureAwait(false);
         AddHome(cb);
         await ModifyInteraction(eb, cb).ConfigureAwait(false);
     }
@@ -36,18 +36,18 @@ public partial class SinusWizardModule
 
         _logger.LogInformation("{method}:{userId}:{uid}", nameof(SelectionUserinfo), Context.Interaction.User.Id, uid);
 
-        using var sinusDb = await GetDbContext().ConfigureAwait(false);
+        using var db = await GetDbContext().ConfigureAwait(false);
         EmbedBuilder eb = new();
         eb.WithTitle($"User Info for {uid}");
-        await HandleUserInfo(eb, sinusDb, uid).ConfigureAwait(false);
+        await HandleUserInfo(eb, db, uid).ConfigureAwait(false);
         eb.WithColor(Color.Green);
         ComponentBuilder cb = new();
-        await AddUserSelection(sinusDb, cb, "wizard-userinfo-select").ConfigureAwait(false);
+        await AddUserSelection(db, cb, "wizard-userinfo-select").ConfigureAwait(false);
         AddHome(cb);
         await ModifyInteraction(eb, cb).ConfigureAwait(false);
     }
 
-    private async Task HandleUserInfo(EmbedBuilder eb, SinusDbContext db, string uid)
+    private async Task HandleUserInfo(EmbedBuilder eb, LaciDbContext db, string uid)
     {
         ulong userToCheckForDiscordId = Context.User.Id;
 

@@ -2,7 +2,7 @@
 
 namespace LaciSynchroni.Shared.Utils.Configuration;
 
-public class AuthServiceConfiguration : SinusConfigurationBase
+public class AuthServiceConfiguration : LaciConfigurationBase
 {
     public string GeoIPDbCityFile { get; set; } = string.Empty;
     public bool UseGeoIP { get; set; } = false;

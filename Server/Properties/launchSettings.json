@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "SinusSynchronousServer": {
+    "LaciSynchroni.Server": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": false,

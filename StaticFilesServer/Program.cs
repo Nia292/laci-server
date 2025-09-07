@@ -13,11 +13,11 @@ public class Program
         using (var scope = host.Services.CreateScope())
         {
             var options = host.Services.GetService<IConfigurationService<StaticFilesServerConfiguration>>();
-            var optionsServer = host.Services.GetService<IConfigurationService<SinusConfigurationBase>>();
+            var optionsServer = host.Services.GetService<IConfigurationService<LaciConfigurationBase>>();
             var logger = host.Services.GetService<ILogger<Program>>();
-            logger.LogInformation("Loaded SinusSynchronous Static Files Server Configuration (IsMain: {isMain})", options.IsMain);
+            logger.LogInformation("Loaded LaciSynchroni Static Files Server Configuration (IsMain: {isMain})", options.IsMain);
             logger.LogInformation(options.ToString());
-            logger.LogInformation("Loaded SinusSynchronous Server Auth Configuration (IsMain: {isMain})", optionsServer.IsMain);
+            logger.LogInformation("Loaded LaciSynchroni Server Auth Configuration (IsMain: {isMain})", optionsServer.IsMain);
             logger.LogInformation(optionsServer.ToString());
         }
 

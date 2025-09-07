@@ -26,11 +26,11 @@ public class OAuthController : AuthControllerBase
     private static readonly ConcurrentDictionary<string, string> _cookieOAuthResponse = [];
 
     public OAuthController(ILogger<OAuthController> logger,
-    IHttpContextAccessor accessor, IDbContextFactory<SinusDbContext> sinusDbContext,
+    IHttpContextAccessor accessor, IDbContextFactory<LaciDbContext> dbContextFactory,
     SecretKeyAuthenticatorService secretKeyAuthenticatorService,
     IConfigurationService<AuthServiceConfiguration> configuration,
     IDatabase redisDb)
-        : base(logger, accessor, sinusDbContext, secretKeyAuthenticatorService,
+        : base(logger, accessor, dbContextFactory, secretKeyAuthenticatorService,
             configuration, redisDb)
     {
     }
@@ -143,25 +143,25 @@ public class OAuthController : AuthControllerBase
         if (discordUserId == 0)
             return BadRequest("Failed to get Discord ID from login token");
 
-        using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
-        var sinusUser = await dbContext.LodeStoneAuth.Include(u => u.User).SingleOrDefaultAsync(u => u.DiscordId == discordUserId);
-        if (sinusUser == default)
+        var user = await dbContext.LodeStoneAuth.Include(u => u.User).SingleOrDefaultAsync(u => u.DiscordId == discordUserId);
+        if (user == default)
         {
-            Logger.LogDebug("Failed to get Sinus user for {session}, DiscordId: {id}", reqId, discordUserId);
+            Logger.LogDebug("Failed to get user for {session}, DiscordId: {id}", reqId, discordUserId);
 
-            return BadRequest("Could not find a Sinus user associated to this Discord account.");
+            return BadRequest("Could not find a user associated to this Discord account.");
         }
 
         JwtSecurityToken? jwt = null;
         try
         {
             jwt = CreateJwt([
-                new Claim(SinusClaimTypes.Uid, sinusUser.User!.UID),
-                new Claim(SinusClaimTypes.Expires, DateTime.UtcNow.AddDays(14).Ticks.ToString(CultureInfo.InvariantCulture)),
-                new Claim(SinusClaimTypes.DiscordId, discordUserId.ToString()),
-                new Claim(SinusClaimTypes.DiscordUser, discordUserName),
-                new Claim(SinusClaimTypes.OAuthLoginToken, true.ToString())
+                new Claim(LaciClaimTypes.Uid, user.User!.UID),
+                new Claim(LaciClaimTypes.Expires, DateTime.UtcNow.AddDays(14).Ticks.ToString(CultureInfo.InvariantCulture)),
+                new Claim(LaciClaimTypes.DiscordId, discordUserId.ToString()),
+                new Claim(LaciClaimTypes.DiscordUser, discordUserName),
+                new Claim(LaciClaimTypes.OAuthLoginToken, true.ToString())
             ]);
         }
         catch (Exception ex)
@@ -198,7 +198,7 @@ public class OAuthController : AuthControllerBase
         if (!secretKeys.Any())
             return [];
 
-        using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
         Dictionary<string, string> secretKeysToUIDDict = secretKeys.Distinct().ToDictionary(k => k, _ => string.Empty, StringComparer.Ordinal);
         foreach (var key in secretKeys)
@@ -218,8 +218,8 @@ public class OAuthController : AuthControllerBase
     [HttpPost(AuthRoutes.OAuth_RenewOAuthToken)]
     public IActionResult RenewOAuthToken()
     {
-        var claims = HttpContext.User.Claims.Where(c => c.Type != SinusClaimTypes.Expires).ToList();
-        claims.Add(new Claim(SinusClaimTypes.Expires, DateTime.UtcNow.AddDays(14).Ticks.ToString(CultureInfo.InvariantCulture)));
+        var claims = HttpContext.User.Claims.Where(c => c.Type != LaciClaimTypes.Expires).ToList();
+        claims.Add(new Claim(LaciClaimTypes.Expires, DateTime.UtcNow.AddDays(14).Ticks.ToString(CultureInfo.InvariantCulture)));
         return Content(CreateJwt(claims).RawData);
     }
 
@@ -266,12 +266,12 @@ public class OAuthController : AuthControllerBase
     [HttpGet(AuthRoutes.OAuth_GetUIDs)]
     public async Task<Dictionary<string, string>> GetAvailableUIDs()
     {
-        string primaryUid = HttpContext.User.Claims.Single(c => string.Equals(c.Type, SinusClaimTypes.Uid, StringComparison.Ordinal))!.Value;
-        using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();
+        string primaryUid = HttpContext.User.Claims.Single(c => string.Equals(c.Type, LaciClaimTypes.Uid, StringComparison.Ordinal))!.Value;
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
-        var sinusUser = await dbContext.Auth.AsNoTracking().Include(u => u.User).FirstOrDefaultAsync(f => f.UserUID == primaryUid).ConfigureAwait(false);
-        if (sinusUser == null || sinusUser.User == null) return [];
-        var uid = sinusUser.User.UID;
+        var user = await dbContext.Auth.AsNoTracking().Include(u => u.User).FirstOrDefaultAsync(f => f.UserUID == primaryUid).ConfigureAwait(false);
+        if (user == null || user.User == null) return [];
+        var uid = user.User.UID;
         var allUids = await dbContext.Auth.AsNoTracking().Include(u => u.User).Where(a => a.UserUID == uid || a.PrimaryUserUID == uid).ToListAsync().ConfigureAwait(false);
         var result = allUids.OrderBy(u => u.UserUID == uid ? 0 : 1).ThenBy(u => u.UserUID).Select(u => (u.UserUID, u.User.Alias)).ToDictionary();
         return result;
@@ -281,16 +281,16 @@ public class OAuthController : AuthControllerBase
     [HttpPost(AuthRoutes.OAuth_CreateOAuth)]
     public async Task<IActionResult> CreateTokenWithOAuth(string uid, string charaIdent)
     {
-        using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
 
         return await AuthenticateOAuthInternal(dbContext, uid, charaIdent);
     }
 
-    private async Task<IActionResult> AuthenticateOAuthInternal(SinusDbContext dbContext, string requestedUid, string charaIdent)
+    private async Task<IActionResult> AuthenticateOAuthInternal(LaciDbContext dbContext, string requestedUid, string charaIdent)
     {
         try
         {
-            string primaryUid = HttpContext.User.Claims.Single(c => string.Equals(c.Type, SinusClaimTypes.Uid, StringComparison.Ordinal))!.Value;
+            string primaryUid = HttpContext.User.Claims.Single(c => string.Equals(c.Type, LaciClaimTypes.Uid, StringComparison.Ordinal))!.Value;
             if (string.IsNullOrEmpty(requestedUid)) return BadRequest("No UID");
             if (string.IsNullOrEmpty(charaIdent)) return BadRequest("No CharaIdent");
 

@@ -15,7 +15,7 @@ public sealed class ConcurrencyFilter : IHubFilter, IDisposable
 
     private bool _disposed;
 
-    public ConcurrencyFilter(IConfigurationService<ServerConfiguration> config, SinusMetrics sinusMetrics)
+    public ConcurrencyFilter(IConfigurationService<ServerConfiguration> config, LaciMetrics metrics)
     {
         _config = config;
         _config.ConfigChangedEvent += OnConfigChange;
@@ -30,8 +30,8 @@ public sealed class ConcurrencyFilter : IHubFilter, IDisposable
                 var stats = _limiter?.GetStatistics();
                 if (stats != null)
                 {
-                    sinusMetrics.SetGaugeTo(MetricsAPI.GaugeHubConcurrency, stats.CurrentAvailablePermits);
-                    sinusMetrics.SetGaugeTo(MetricsAPI.GaugeHubQueuedConcurrency, stats.CurrentQueuedCount);
+                    metrics.SetGaugeTo(MetricsAPI.GaugeHubConcurrency, stats.CurrentAvailablePermits);
+                    metrics.SetGaugeTo(MetricsAPI.GaugeHubQueuedConcurrency, stats.CurrentQueuedCount);
                 }
                 await Task.Delay(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
             }

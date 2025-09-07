@@ -6,7 +6,7 @@ using System.Text;
 
 namespace LaciSynchroni.Shared.Services;
 
-public sealed class SinusConfigurationServiceServer<T> : IDisposable, IConfigurationService<T> where T : class, ISinusConfiguration
+public sealed class LaciConfigurationServiceServer<T> : IDisposable, IConfigurationService<T> where T : class, ILaciConfiguration
 {
     private readonly IOptionsMonitor<T> _config;
     private bool _disposed;
@@ -15,7 +15,7 @@ public sealed class SinusConfigurationServiceServer<T> : IDisposable, IConfigura
     public event EventHandler ConfigChangedEvent;
     private IDisposable _onChanged;
 
-    public SinusConfigurationServiceServer(IOptionsMonitor<T> config)
+    public LaciConfigurationServiceServer(IOptionsMonitor<T> config)
     {
         _config = config;
         _onChanged = config.OnChange((c) => { ConfigChangedEvent?.Invoke(this, EventArgs.Empty); });

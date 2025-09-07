@@ -11,11 +11,11 @@ namespace LaciSynchroni.Server.Hubs;
 
 public partial class ServerHub
 {
-    public string UserCharaIdent => Context.User?.Claims?.SingleOrDefault(c => string.Equals(c.Type, SinusClaimTypes.CharaIdent, StringComparison.Ordinal))?.Value ?? throw new Exception("No Chara Ident in Claims");
+    public string UserCharaIdent => Context.User?.Claims?.SingleOrDefault(c => string.Equals(c.Type, LaciClaimTypes.CharaIdent, StringComparison.Ordinal))?.Value ?? throw new Exception("No Chara Ident in Claims");
 
-    public string UserUID => Context.User?.Claims?.SingleOrDefault(c => string.Equals(c.Type, SinusClaimTypes.Uid, StringComparison.Ordinal))?.Value ?? throw new Exception("No UID in Claims");
+    public string UserUID => Context.User?.Claims?.SingleOrDefault(c => string.Equals(c.Type, LaciClaimTypes.Uid, StringComparison.Ordinal))?.Value ?? throw new Exception("No UID in Claims");
 
-    public string Continent => Context.User?.Claims?.SingleOrDefault(c => string.Equals(c.Type, SinusClaimTypes.Continent, StringComparison.Ordinal))?.Value ?? "UNK";
+    public string Continent => Context.User?.Claims?.SingleOrDefault(c => string.Equals(c.Type, LaciClaimTypes.Continent, StringComparison.Ordinal))?.Value ?? "UNK";
 
     private async Task DeleteUser(User user)
     {
@@ -65,7 +65,7 @@ public partial class ServerHub
         DbContext.Permissions.RemoveRange(individualPermissions);
         DbContext.GroupBans.RemoveRange(bannedEntries);
 
-        _sinusMetrics.IncCounter(MetricsAPI.CounterUsersRegisteredDeleted, 1);
+        _metrics.IncCounter(MetricsAPI.CounterUsersRegisteredDeleted, 1);
 
         DbContext.ClientPairs.RemoveRange(otherPairData);
         DbContext.Users.Remove(user);
@@ -184,7 +184,7 @@ public partial class ServerHub
 
     private async Task UserLeaveGroup(GroupDto dto, string userUid)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(dto));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto));
 
         var (exists, groupPair) = await TryValidateUserInGroup(dto.Group.GID, userUid).ConfigureAwait(false);
         if (!exists) return;
@@ -204,7 +204,7 @@ public partial class ServerHub
         {
             if (!groupPairsWithoutSelf.Any())
             {
-                _logger.LogCallInfo(SinusHubLogger.Args(dto, "Deleted"));
+                _logger.LogCallInfo(ServerHubLogger.Args(dto, "Deleted"));
 
                 DbContext.Groups.Remove(group);
             }
@@ -214,7 +214,7 @@ public partial class ServerHub
 
                 if (groupHasMigrated.Item1)
                 {
-                    _logger.LogCallInfo(SinusHubLogger.Args(dto, "Migrated", groupHasMigrated.Item2));
+                    _logger.LogCallInfo(ServerHubLogger.Args(dto, "Migrated", groupHasMigrated.Item2));
 
                     var user = await DbContext.Users.SingleAsync(u => u.UID == groupHasMigrated.Item2).ConfigureAwait(false);
 
@@ -223,7 +223,7 @@ public partial class ServerHub
                 }
                 else
                 {
-                    _logger.LogCallInfo(SinusHubLogger.Args(dto, "Deleted"));
+                    _logger.LogCallInfo(ServerHubLogger.Args(dto, "Deleted"));
 
                     await Clients.Users(groupPairsWithoutSelf.Select(p => p.GroupUserUID)).Client_GroupDelete(dto).ConfigureAwait(false);
 
@@ -239,7 +239,7 @@ public partial class ServerHub
 
         await DbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args(dto, "Success"));
+        _logger.LogCallInfo(ServerHubLogger.Args(dto, "Success"));
 
         await Clients.Users(groupPairsWithoutSelf.Select(p => p.GroupUserUID)).Client_GroupPairLeft(new GroupPairDto(dto.Group, groupPair.GroupUser.ToUserData())).ConfigureAwait(false);
 

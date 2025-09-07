@@ -53,7 +53,7 @@ public partial class ServerHub
         await DbContext.CharaData.AddAsync(charaData).ConfigureAwait(false);
         await DbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args("SUCCESS", charaDataId));
+        _logger.LogCallInfo(ServerHubLogger.Args("SUCCESS", charaDataId));
 
         return GetCharaDataFullDto(charaData);
     }
@@ -67,7 +67,7 @@ public partial class ServerHub
 
         try
         {
-            _logger.LogCallInfo(SinusHubLogger.Args("SUCCESS", id));
+            _logger.LogCallInfo(ServerHubLogger.Args("SUCCESS", id));
 
             DbContext.Remove(existingData);
             await DbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -75,7 +75,7 @@ public partial class ServerHub
         }
         catch (Exception ex)
         {
-            _logger.LogCallWarning(SinusHubLogger.Args("FAILURE", id, ex.Message));
+            _logger.LogCallWarning(ServerHubLogger.Args("FAILURE", id, ex.Message));
             return false;
         }
     }
@@ -91,7 +91,7 @@ public partial class ServerHub
             await DbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        _logger.LogCallInfo(SinusHubLogger.Args("SUCCESS", id));
+        _logger.LogCallInfo(ServerHubLogger.Args("SUCCESS", id));
 
         return GetCharaDataDownloadDto(charaData);
     }
@@ -101,7 +101,7 @@ public partial class ServerHub
     {
         var charaData = await GetCharaDataById(id, nameof(CharaDataGetMetainfo)).ConfigureAwait(false);
 
-        _logger.LogCallInfo(SinusHubLogger.Args("SUCCESS", id));
+        _logger.LogCallInfo(ServerHubLogger.Args("SUCCESS", id));
 
         return GetCharaDataMetaInfoDto(charaData);
     }
@@ -120,14 +120,14 @@ public partial class ServerHub
             .Include(u => u.Poses)
             .AsSplitQuery()
             .Where(c => c.UploaderUID == UserUID).ToListAsync().ConfigureAwait(false);
-        _logger.LogCallInfo(SinusHubLogger.Args("SUCCESS"));
+        _logger.LogCallInfo(ServerHubLogger.Args("SUCCESS"));
         return [.. ownCharaData.Select(GetCharaDataFullDto)];
     }
 
     [Authorize(Policy = "Identified")]
     public async Task<CharaDataFullDto?> CharaDataAttemptRestore(string id)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(id));
+        _logger.LogCallInfo(ServerHubLogger.Args(id));
         var charaData = await DbContext.CharaData
             .Include(u => u.Files)
             .Include(u => u.FileSwaps)
@@ -212,7 +212,7 @@ public partial class ServerHub
             sharedCharaData.Add(charaData);
         }
 
-        _logger.LogCallInfo(SinusHubLogger.Args("SUCCESS", sharedCharaData.Count));
+        _logger.LogCallInfo(ServerHubLogger.Args("SUCCESS", sharedCharaData.Count));
 
         return [.. sharedCharaData.Select(GetCharaDataMetaInfoDto)];
     }
@@ -448,7 +448,7 @@ public partial class ServerHub
         {
             charaData.UpdatedDate = DateTime.UtcNow;
             await DbContext.SaveChangesAsync().ConfigureAwait(false);
-            _logger.LogCallInfo(SinusHubLogger.Args("SUCCESS", anyChanges));
+            _logger.LogCallInfo(ServerHubLogger.Args("SUCCESS", anyChanges));
         }
 
         return GetCharaDataFullDto(charaData);
@@ -608,7 +608,7 @@ public partial class ServerHub
         var splitid = id.Split(":", StringSplitOptions.None);
         if (splitid.Length != 2)
         {
-            _logger.LogCallWarning(SinusHubLogger.Args("INVALID", id));
+            _logger.LogCallWarning(ServerHubLogger.Args("INVALID", id));
             throw new InvalidOperationException($"Id {id} not in expected format");
         }
 
@@ -623,7 +623,7 @@ public partial class ServerHub
 
         if (charaData == null)
         {
-            _logger.LogCallWarning(SinusHubLogger.Args("NOT FOUND", id));
+            _logger.LogCallWarning(ServerHubLogger.Args("NOT FOUND", id));
             throw new InvalidDataException($"No chara data with {id} found");
         }
 
@@ -632,7 +632,7 @@ public partial class ServerHub
 
         if (!await CheckCharaDataAllowance(charaData, groups).ConfigureAwait(false))
         {
-            _logger.LogCallWarning(SinusHubLogger.Args("UNAUTHORIZED", id));
+            _logger.LogCallWarning(ServerHubLogger.Args("UNAUTHORIZED", id));
             throw new UnauthorizedAccessException($"User is not allowed to download {id}");
         }
 

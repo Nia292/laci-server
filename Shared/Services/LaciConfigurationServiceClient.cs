@@ -13,11 +13,11 @@ using System.Text.Json;
 
 namespace LaciSynchroni.Shared.Services;
 
-public class SinusConfigurationServiceClient<T> : IHostedService, IConfigurationService<T> where T : class, ISinusConfiguration
+public class LaciConfigurationServiceClient<T> : IHostedService, IConfigurationService<T> where T : class, ILaciConfiguration
 {
     private readonly IOptionsMonitor<T> _config;
     private readonly ConcurrentDictionary<string, object> _cachedRemoteProperties = new(StringComparer.Ordinal);
-    private readonly ILogger<SinusConfigurationServiceClient<T>> _logger;
+    private readonly ILogger<LaciConfigurationServiceClient<T>> _logger;
     private readonly ServerTokenGenerator _serverTokenGenerator;
     private readonly CancellationTokenSource _updateTaskCts = new();
     private bool _initialized = false;
@@ -28,18 +28,18 @@ public class SinusConfigurationServiceClient<T> : IHostedService, IConfiguration
     private Uri GetRoute(string key, string value)
     {
         if (_config.CurrentValue.GetType() == typeof(ServerConfiguration))
-            return new Uri((_config.CurrentValue as ServerConfiguration).MainServerAddress, $"configuration/SinusServerConfiguration/{nameof(SinusServerConfigurationController.GetConfigurationEntry)}?key={key}&defaultValue={value}");
-        if (_config.CurrentValue.GetType() == typeof(SinusConfigurationBase))
-            return new Uri((_config.CurrentValue as SinusConfigurationBase).MainServerAddress, $"configuration/SinusBaseConfiguration/{nameof(SinusBaseConfigurationController.GetConfigurationEntry)}?key={key}&defaultValue={value}");
+            return new Uri((_config.CurrentValue as ServerConfiguration).MainServerAddress, $"configuration/LaciServerConfiguration/{nameof(LaciServerConfigurationController.GetConfigurationEntry)}?key={key}&defaultValue={value}");
+        if (_config.CurrentValue.GetType() == typeof(LaciConfigurationBase))
+            return new Uri((_config.CurrentValue as LaciConfigurationBase).MainServerAddress, $"configuration/LaciBaseConfiguration/{nameof(LaciBaseConfigurationController.GetConfigurationEntry)}?key={key}&defaultValue={value}");
         if (_config.CurrentValue.GetType() == typeof(ServicesConfiguration))
-            return new Uri((_config.CurrentValue as ServicesConfiguration).MainServerAddress, $"configuration/SinusServicesConfiguration/{nameof(SinusServicesConfigurationController.GetConfigurationEntry)}?key={key}&defaultValue={value}");
+            return new Uri((_config.CurrentValue as ServicesConfiguration).MainServerAddress, $"configuration/LaciServicesConfiguration/{nameof(LaciServicesConfigurationController.GetConfigurationEntry)}?key={key}&defaultValue={value}");
         if (_config.CurrentValue.GetType() == typeof(StaticFilesServerConfiguration))
-            return new Uri((_config.CurrentValue as StaticFilesServerConfiguration).MainFileServerAddress, $"configuration/SinusStaticFilesServerConfiguration/{nameof(SinusStaticFilesServerConfigurationController.GetConfigurationEntry)}?key={key}&defaultValue={value}");
+            return new Uri((_config.CurrentValue as StaticFilesServerConfiguration).MainFileServerAddress, $"configuration/LaciStaticFilesServerConfiguration/{nameof(LaciStaticFilesServerConfigurationController.GetConfigurationEntry)}?key={key}&defaultValue={value}");
 
         throw new NotSupportedException("Config is not supported to be gotten remotely");
     }
 
-    public SinusConfigurationServiceClient(ILogger<SinusConfigurationServiceClient<T>> logger, IOptionsMonitor<T> config, ServerTokenGenerator serverTokenGenerator)
+    public LaciConfigurationServiceClient(ILogger<LaciConfigurationServiceClient<T>> logger, IOptionsMonitor<T> config, ServerTokenGenerator serverTokenGenerator)
     {
         _config = config;
         _logger = logger;
@@ -178,7 +178,7 @@ public class SinusConfigurationServiceClient<T> : IHostedService, IConfiguration
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting SinusConfigurationServiceClient");
+        _logger.LogInformation("Starting LaciConfigurationServiceClient");
         _ = UpdateRemoteProperties(_updateTaskCts.Token);
         while (!_initialized && !cancellationToken.IsCancellationRequested) await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
     }

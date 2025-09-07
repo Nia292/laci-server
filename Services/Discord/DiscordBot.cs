@@ -18,14 +18,14 @@ internal class DiscordBot : IHostedService
     private readonly IConnectionMultiplexer _connectionMultiplexer;
     private readonly DiscordSocketClient _discordClient;
     private readonly ILogger<DiscordBot> _logger;
-    private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
     private readonly IServiceProvider _services;
     private InteractionService _interactionModule;
     private readonly CancellationTokenSource? _processReportQueueCts;
     private CancellationTokenSource? _clientConnectedCts;
 
     public DiscordBot(DiscordBotServices botServices, IServiceProvider services, IConfigurationService<ServicesConfiguration> configuration,
-        IDbContextFactory<SinusDbContext> dbContextFactory,
+        IDbContextFactory<LaciDbContext> dbContextFactory,
         ILogger<DiscordBot> logger, IConnectionMultiplexer connectionMultiplexer)
     {
         _botServices = botServices;
@@ -55,8 +55,8 @@ internal class DiscordBot : IHostedService
             _interactionModule?.Dispose();
             _interactionModule = new InteractionService(_discordClient);
             _interactionModule.Log += Log;
-            await _interactionModule.AddModuleAsync(typeof(SinusModule), _services).ConfigureAwait(false);
-            await _interactionModule.AddModuleAsync(typeof(SinusWizardModule), _services).ConfigureAwait(false);
+            await _interactionModule.AddModuleAsync(typeof(LaciModule), _services).ConfigureAwait(false);
+            await _interactionModule.AddModuleAsync(typeof(LaciWizardModule), _services).ConfigureAwait(false);
 
             await _discordClient.LoginAsync(TokenType.Bot, token).ConfigureAwait(false);
             await _discordClient.StartAsync().ConfigureAwait(false);
@@ -77,7 +77,7 @@ internal class DiscordBot : IHostedService
     {
         try
         {
-            using SinusDbContext dbContext = await _dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
+            using LaciDbContext dbContext = await _dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
             var alreadyRegistered = await dbContext.LodeStoneAuth.AnyAsync(u => u.DiscordId == arg.Id).ConfigureAwait(false);
             if (alreadyRegistered)
             {
@@ -183,7 +183,7 @@ internal class DiscordBot : IHostedService
 
     private async Task GenerateOrUpdateWizardMessage(SocketTextChannel channel, IUserMessage? prevMessage)
     {
-        var serverName = _configurationService.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Sinus Synchronous");
+        var serverName = _configurationService.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Laci Synchroni");
         EmbedBuilder eb = new EmbedBuilder();
         eb.WithTitle($"{serverName} Services Bot Interaction Service");
         eb.WithDescription("Press \"Start\" to interact with this bot!" + Environment.NewLine + Environment.NewLine
@@ -253,7 +253,7 @@ internal class DiscordBot : IHostedService
 
     private async Task ProcessUserRoles(RestGuild guild, CancellationToken token)
     {
-        using SinusDbContext dbContext = await _dbContextFactory.CreateDbContextAsync(token).ConfigureAwait(false);
+        using LaciDbContext dbContext = await _dbContextFactory.CreateDbContextAsync(token).ConfigureAwait(false);
         var roleId = _configurationService.GetValueOrDefault<ulong?>(nameof(ServicesConfiguration.DiscordRoleRegistered), 0);
         var kickUnregistered = _configurationService.GetValueOrDefault(nameof(ServicesConfiguration.KickNonRegisteredUsers), false);
         if (roleId == null) return;
@@ -368,7 +368,7 @@ internal class DiscordBot : IHostedService
         }
     }
 
-    private async Task CheckVanityForGroup(RestGuild restGuild, Dictionary<ulong, string> allowedRoleIds, SinusDbContext db, Group group, CancellationToken token)
+    private async Task CheckVanityForGroup(RestGuild restGuild, Dictionary<ulong, string> allowedRoleIds, LaciDbContext db, Group group, CancellationToken token)
     {
         var groupPrimaryUser = group.OwnerUID;
         var groupOwner = await db.Auth.Include(u => u.User).SingleOrDefaultAsync(u => u.UserUID == group.OwnerUID).ConfigureAwait(false);
@@ -397,7 +397,7 @@ internal class DiscordBot : IHostedService
         }
     }
 
-    private async Task CheckVanityForUser(RestGuild restGuild, Dictionary<ulong, string> allowedRoleIds, SinusDbContext db, LodeStoneAuth lodestoneAuth, CancellationToken token)
+    private async Task CheckVanityForUser(RestGuild restGuild, Dictionary<ulong, string> allowedRoleIds, LaciDbContext db, LodeStoneAuth lodestoneAuth, CancellationToken token)
     {
         var discordUser = await restGuild.GetUserAsync(lodestoneAuth.DiscordId).ConfigureAwait(false);
         _logger.LogInformation($"Checking User: {lodestoneAuth.DiscordId}, {lodestoneAuth.User.UID} ({lodestoneAuth.User.Alias}), User in Roles: {string.Join(", ", discordUser?.RoleIds ?? new List<ulong>())}");
@@ -426,7 +426,7 @@ internal class DiscordBot : IHostedService
         {
             var endPoint = _connectionMultiplexer.GetEndPoints().First();
             var onlineUsers = await _connectionMultiplexer.GetServer(endPoint).KeysAsync(pattern: "UID:*").CountAsync().ConfigureAwait(false);
-            var serverName = _configurationService.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Sinus Synchronous");
+            var serverName = _configurationService.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Laci Synchroni");
 
             _logger.LogInformation("Users online: " + onlineUsers);
             await _discordClient.SetActivityAsync(new Game($"{serverName} for {onlineUsers} Users")).ConfigureAwait(false);

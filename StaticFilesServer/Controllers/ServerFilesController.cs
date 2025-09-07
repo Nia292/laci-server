@@ -27,25 +27,25 @@ public class ServerFilesController : ControllerBase
     private static readonly ConcurrentDictionary<string, SemaphoreSlim> _fileUploadLocks = new(StringComparer.Ordinal);
     private readonly string _basePath;
     private readonly CachedFileProvider _cachedFileProvider;
-    private readonly IConfigurationService<StaticFilesServerConfiguration> _configuration;
+    private readonly IConfigurationService<StaticFilesServerConfiguration> _config;
     private readonly IHubContext<ServerHub> _hubContext;
-    private readonly IDbContextFactory<SinusDbContext> _sinusDbContext;
-    private readonly SinusMetrics _metricsClient;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
+    private readonly LaciMetrics _metricsClient;
     private readonly MainServerShardRegistrationService _shardRegistrationService;
 
     public ServerFilesController(ILogger<ServerFilesController> logger, CachedFileProvider cachedFileProvider,
-        IConfigurationService<StaticFilesServerConfiguration> configuration,
+        IConfigurationService<StaticFilesServerConfiguration> config,
         IHubContext<ServerHub> hubContext,
-        IDbContextFactory<SinusDbContext> sinusDbContext, SinusMetrics metricsClient,
+        IDbContextFactory<LaciDbContext> dbContextFactory, LaciMetrics metricsClient,
         MainServerShardRegistrationService shardRegistrationService) : base(logger)
     {
-        _basePath = configuration.GetValueOrDefault(nameof(StaticFilesServerConfiguration.UseColdStorage), false)
-            ? configuration.GetValue<string>(nameof(StaticFilesServerConfiguration.ColdStorageDirectory))
-            : configuration.GetValue<string>(nameof(StaticFilesServerConfiguration.CacheDirectory));
+        _basePath = config.GetValueOrDefault(nameof(StaticFilesServerConfiguration.UseColdStorage), false)
+            ? config.GetValue<string>(nameof(StaticFilesServerConfiguration.ColdStorageDirectory))
+            : config.GetValue<string>(nameof(StaticFilesServerConfiguration.CacheDirectory));
         _cachedFileProvider = cachedFileProvider;
-        _configuration = configuration;
+        _config = config;
         _hubContext = hubContext;
-        _sinusDbContext = sinusDbContext;
+        _dbContextFactory = dbContextFactory;
         _metricsClient = metricsClient;
         _shardRegistrationService = shardRegistrationService;
     }
@@ -53,9 +53,9 @@ public class ServerFilesController : ControllerBase
     [HttpPost(FilesRoutes.ServerFiles_DeleteAll)]
     public async Task<IActionResult> FilesDeleteAll()
     {
-        using var dbContext = await _sinusDbContext.CreateDbContextAsync();
-        var ownFiles = await dbContext.Files.Where(f => f.Uploaded && f.Uploader.UID == SinusUser).ToListAsync().ConfigureAwait(false);
-        bool isColdStorage = _configuration.GetValueOrDefault(nameof(StaticFilesServerConfiguration.UseColdStorage), false);
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+        var ownFiles = await dbContext.Files.Where(f => f.Uploaded && f.Uploader.UID == LaciUser).ToListAsync().ConfigureAwait(false);
+        bool isColdStorage = _config.GetValueOrDefault(nameof(StaticFilesServerConfiguration.UseColdStorage), false);
 
         foreach (var dbFile in ownFiles)
         {
@@ -78,7 +78,7 @@ public class ServerFilesController : ControllerBase
     [HttpGet(FilesRoutes.ServerFiles_GetSizes)]
     public async Task<IActionResult> FilesGetSizes([FromBody] List<string> hashes)
     {
-        using var dbContext = await _sinusDbContext.CreateDbContextAsync();
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
         var forbiddenFiles = await dbContext.ForbiddenUploadEntries.
             Where(f => hashes.Contains(f.Hash)).ToListAsync().ConfigureAwait(false);
         List<DownloadFileDto> response = new();
@@ -102,7 +102,7 @@ public class ServerFilesController : ControllerBase
                 var shard = matchingShards.SelectMany(g => g.RegionUris)
                     .OrderBy(g => Guid.NewGuid()).FirstOrDefault();
 
-                baseUrl = shard.Value ?? _configuration.GetValue<Uri>(nameof(StaticFilesServerConfiguration.CdnFullUrl));
+                baseUrl = shard.Value ?? _config.GetValue<Uri>(nameof(StaticFilesServerConfiguration.CdnFullUrl));
             }
 
             response.Add(new DownloadFileDto
@@ -130,7 +130,7 @@ public class ServerFilesController : ControllerBase
     [HttpPost(FilesRoutes.ServerFiles_FilesSend)]
     public async Task<IActionResult> FilesSend([FromBody] FilesSendDto filesSendDto)
     {
-        using var dbContext = await _sinusDbContext.CreateDbContextAsync();
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
         var userSentHashes = new HashSet<string>(filesSendDto.FileHashes.Distinct(StringComparer.Ordinal).Select(s => string.Concat(s.Where(c => char.IsLetterOrDigit(c)))), StringComparer.Ordinal);
         var notCoveredFiles = new Dictionary<string, UploadFileDto>(StringComparer.Ordinal);
@@ -164,7 +164,7 @@ public class ServerFilesController : ControllerBase
 
         if (notCoveredFiles.Any(p => !p.Value.IsForbidden))
         {
-            await _hubContext.Clients.Users(filesSendDto.UIDs).SendAsync(nameof(IServerHub.Client_UserReceiveUploadStatus), new Common.Dto.User.UserDto(new(SinusUser)))
+            await _hubContext.Clients.Users(filesSendDto.UIDs).SendAsync(nameof(IServerHub.Client_UserReceiveUploadStatus), new Common.Dto.User.UserDto(new(LaciUser)))
                 .ConfigureAwait(false);
         }
 
@@ -175,9 +175,9 @@ public class ServerFilesController : ControllerBase
     [RequestSizeLimit(200 * 1024 * 1024)]
     public async Task<IActionResult> UploadFile(string hash, CancellationToken requestAborted)
     {
-        using var dbContext = await _sinusDbContext.CreateDbContextAsync();
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-        _logger.LogInformation("{user}|{file}: Uploading", SinusUser, hash);
+        _logger.LogInformation("{user}|{file}: Uploading", LaciUser, hash);
 
         hash = hash.ToUpperInvariant();
         var existingFile = await dbContext.Files.SingleOrDefaultAsync(f => f.Hash == hash);
@@ -197,7 +197,7 @@ public class ServerFilesController : ControllerBase
             using var memoryStream = new MemoryStream();
             await Request.Body.CopyToAsync(memoryStream, requestAborted).ConfigureAwait(false);
 
-            _logger.LogDebug("{user}|{file}: Finished uploading", SinusUser, hash);
+            _logger.LogDebug("{user}|{file}: Finished uploading", LaciUser, hash);
 
             await StoreData(hash, dbContext, memoryStream).ConfigureAwait(false);
 
@@ -205,7 +205,7 @@ public class ServerFilesController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "{user}|{file}: Error during file upload", SinusUser, hash);
+            _logger.LogError(e, "{user}|{file}: Error during file upload", LaciUser, hash);
             return BadRequest();
         }
         finally
@@ -230,9 +230,9 @@ public class ServerFilesController : ControllerBase
     [RequestSizeLimit(200 * 1024 * 1024)]
     public async Task<IActionResult> UploadFileMunged(string hash, CancellationToken requestAborted)
     {
-        using var dbContext = await _sinusDbContext.CreateDbContextAsync();
+        using var dbContext = await _dbContextFactory.CreateDbContextAsync();
 
-        _logger.LogInformation("{user}|{file}: Uploading munged", SinusUser, hash);
+        _logger.LogInformation("{user}|{file}: Uploading munged", LaciUser, hash);
         hash = hash.ToUpperInvariant();
         var existingFile = await dbContext.Files.SingleOrDefaultAsync(f => f.Hash == hash);
         if (existingFile != null) return Ok();
@@ -254,7 +254,7 @@ public class ServerFilesController : ControllerBase
             MungeBuffer(unmungedFile.AsSpan());
             await using MemoryStream unmungedMs = new(unmungedFile);
 
-            _logger.LogDebug("{user}|{file}: Finished uploading, unmunged stream", SinusUser, hash);
+            _logger.LogDebug("{user}|{file}: Finished uploading, unmunged stream", LaciUser, hash);
 
             await StoreData(hash, dbContext, unmungedMs);
 
@@ -262,7 +262,7 @@ public class ServerFilesController : ControllerBase
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "{user}|{file}: Error during file upload", SinusUser, hash);
+            _logger.LogError(e, "{user}|{file}: Error during file upload", LaciUser, hash);
             return BadRequest();
         }
         finally
@@ -283,7 +283,7 @@ public class ServerFilesController : ControllerBase
         }
     }
 
-    private async Task StoreData(string hash, SinusDbContext dbContext, MemoryStream compressedFileStream)
+    private async Task StoreData(string hash, LaciDbContext dbContext, MemoryStream compressedFileStream)
     {
         var decompressedData = LZ4Wrapper.Unwrap(compressedFileStream.ToArray());
         // reset streams
@@ -293,20 +293,20 @@ public class ServerFilesController : ControllerBase
         var hashString = BitConverter.ToString(SHA1.HashData(decompressedData))
             .Replace("-", "", StringComparison.Ordinal).ToUpperInvariant();
         if (!string.Equals(hashString, hash, StringComparison.Ordinal))
-            throw new InvalidOperationException($"{SinusUser}|{hash}: Hash does not match file, computed: {hashString}, expected: {hash}");
+            throw new InvalidOperationException($"{LaciUser}|{hash}: Hash does not match file, computed: {hashString}, expected: {hash}");
 
         // save file
         var path = FilePathUtil.GetFilePath(_basePath, hash);
         using var fileStream = new FileStream(path, FileMode.Create);
         await compressedFileStream.CopyToAsync(fileStream).ConfigureAwait(false);
-        _logger.LogDebug("{user}|{file}: Uploaded file saved to {path}", SinusUser, hash, path);
+        _logger.LogDebug("{user}|{file}: Uploaded file saved to {path}", LaciUser, hash, path);
 
         // update on db
         await dbContext.Files.AddAsync(new FileCache()
         {
             Hash = hash,
             UploadDate = DateTime.UtcNow,
-            UploaderUID = SinusUser,
+            UploaderUID = LaciUser,
             Size = compressedFileStream.Length,
             Uploaded = true,
             RawSize = decompressedData.LongLength
@@ -314,9 +314,9 @@ public class ServerFilesController : ControllerBase
 
         await dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        _logger.LogDebug("{user}|{file}: Uploaded file saved to DB", SinusUser, hash);
+        _logger.LogDebug("{user}|{file}: Uploaded file saved to DB", LaciUser, hash);
 
-        bool isColdStorage = _configuration.GetValueOrDefault(nameof(StaticFilesServerConfiguration.UseColdStorage), false);
+        bool isColdStorage = _config.GetValueOrDefault(nameof(StaticFilesServerConfiguration.UseColdStorage), false);
 
         _metricsClient.IncGauge(isColdStorage ? MetricsAPI.GaugeFilesTotalColdStorage : MetricsAPI.GaugeFilesTotal, 1);
         _metricsClient.IncGauge(isColdStorage ? MetricsAPI.GaugeFilesTotalSizeColdStorage : MetricsAPI.GaugeFilesTotalSize, compressedFileStream.Length);
@@ -333,20 +333,20 @@ public class ServerFilesController : ControllerBase
             {
                 if (!_fileUploadLocks.TryGetValue(hash, out fileLock))
                 {
-                    _logger.LogDebug("{user}|{file}: Creating filelock", SinusUser, hash);
+                    _logger.LogDebug("{user}|{file}: Creating filelock", LaciUser, hash);
                     _fileUploadLocks[hash] = fileLock = new SemaphoreSlim(1);
                 }
             }
 
             try
             {
-                _logger.LogDebug("{user}|{file}: Waiting for filelock", SinusUser, hash);
+                _logger.LogDebug("{user}|{file}: Waiting for filelock", LaciUser, hash);
                 await fileLock.WaitAsync(requestAborted).ConfigureAwait(false);
                 successfullyWaited = true;
             }
             catch (ObjectDisposedException)
             {
-                _logger.LogWarning("{user}|{file}: Semaphore disposed, recreating", SinusUser, hash);
+                _logger.LogWarning("{user}|{file}: Semaphore disposed, recreating", LaciUser, hash);
             }
         }
 

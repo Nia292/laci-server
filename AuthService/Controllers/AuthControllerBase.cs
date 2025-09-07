@@ -21,12 +21,12 @@ public abstract class AuthControllerBase : Controller
     protected readonly ILogger Logger;
     protected readonly IHttpContextAccessor HttpAccessor;
     protected readonly IConfigurationService<AuthServiceConfiguration> Configuration;
-    protected readonly IDbContextFactory<SinusDbContext> SinusDbContextFactory;
+    protected readonly IDbContextFactory<LaciDbContext> DbContextFactory;
     protected readonly SecretKeyAuthenticatorService SecretKeyAuthenticatorService;
     private readonly IDatabase _redis;
 
     protected AuthControllerBase(ILogger logger,
-    IHttpContextAccessor accessor, IDbContextFactory<SinusDbContext> sinusDbContextFactory,
+    IHttpContextAccessor accessor, IDbContextFactory<LaciDbContext> dbContextFactory,
     SecretKeyAuthenticatorService secretKeyAuthenticatorService,
     IConfigurationService<AuthServiceConfiguration> configuration,
     IDatabase redisDb)
@@ -34,12 +34,12 @@ public abstract class AuthControllerBase : Controller
         Logger = logger;
         HttpAccessor = accessor;
         _redis = redisDb;
-        SinusDbContextFactory = sinusDbContextFactory;
+        DbContextFactory = dbContextFactory;
         SecretKeyAuthenticatorService = secretKeyAuthenticatorService;
         Configuration = configuration;
     }
 
-    protected async Task<IActionResult> GenericAuthResponse(SinusDbContext dbContext, string charaIdent, SecretKeyAuthReply authResult)
+    protected async Task<IActionResult> GenericAuthResponse(LaciDbContext dbContext, string charaIdent, SecretKeyAuthReply authResult)
     {
         if (await IsIdentBanned(dbContext, charaIdent))
         {
@@ -50,7 +50,7 @@ public abstract class AuthControllerBase : Controller
         if (!authResult.Success && !authResult.TempBan)
         {
             Logger.LogWarning("Authenticate:INVALID:{id}:{ident}", authResult?.Uid ?? "NOUID", charaIdent);
-            return Unauthorized("The provided secret key is invalid. Verify your Sinus accounts existence and/or recover the secret key.");
+            return Unauthorized("The provided secret key is invalid. Verify your accounts existence and/or recover the secret key.");
         }
         if (!authResult.Success && authResult.TempBan)
         {
@@ -67,14 +67,14 @@ public abstract class AuthControllerBase : Controller
             }
 
             Logger.LogWarning("Authenticate:UIDBAN:{id}:{ident}", authResult.Uid, charaIdent);
-            return Unauthorized("Your Sinus account is banned from using the service.");
+            return Unauthorized("Your account is banned from using the service.");
         }
 
         var existingIdent = await _redis.StringGetAsync("UID:" + authResult.Uid);
         if (!string.IsNullOrEmpty(existingIdent))
         {
             Logger.LogWarning("Authenticate:DUPLICATE:{id}:{ident}", authResult.Uid, charaIdent);
-            return Unauthorized("Already logged in to this Sinus account. Reconnect in 60 seconds. If you keep seeing this issue, restart your game.");
+            return Unauthorized("Already logged in to this account. Reconnect in 60 seconds. If you keep seeing this issue, restart your game.");
         }
 
         Logger.LogInformation("Authenticate:SUCCESS:{id}:{ident}", authResult.Uid, charaIdent);
@@ -83,16 +83,16 @@ public abstract class AuthControllerBase : Controller
 
     protected JwtSecurityToken CreateJwt(IEnumerable<Claim> authClaims)
     {
-        var authSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetValue<string>(nameof(SinusConfigurationBase.Jwt))))
+        var authSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration.GetValue<string>(nameof(LaciConfigurationBase.Jwt))))
         {
-            KeyId = Configuration.GetValue<string>(nameof(SinusConfigurationBase.JwtKeyId)),
+            KeyId = Configuration.GetValue<string>(nameof(LaciConfigurationBase.JwtKeyId)),
         };
 
         var token = new SecurityTokenDescriptor()
         {
             Subject = new ClaimsIdentity(authClaims),
             SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256Signature),
-            Expires = new(long.Parse(authClaims.First(f => string.Equals(f.Type, SinusClaimTypes.Expires, StringComparison.Ordinal)).Value!, CultureInfo.InvariantCulture), DateTimeKind.Utc),
+            Expires = new(long.Parse(authClaims.First(f => string.Equals(f.Type, LaciClaimTypes.Expires, StringComparison.Ordinal)).Value!, CultureInfo.InvariantCulture), DateTimeKind.Utc),
         };
 
         var handler = new JwtSecurityTokenHandler();
@@ -103,10 +103,10 @@ public abstract class AuthControllerBase : Controller
     {
         var token = CreateJwt(new List<Claim>()
         {
-            new Claim(SinusClaimTypes.Uid, uid),
-            new Claim(SinusClaimTypes.CharaIdent, charaIdent),
-            new Claim(SinusClaimTypes.Alias, alias),
-            new Claim(SinusClaimTypes.Expires, DateTime.UtcNow.AddHours(6).Ticks.ToString(CultureInfo.InvariantCulture)),
+            new Claim(LaciClaimTypes.Uid, uid),
+            new Claim(LaciClaimTypes.CharaIdent, charaIdent),
+            new Claim(LaciClaimTypes.Alias, alias),
+            new Claim(LaciClaimTypes.Expires, DateTime.UtcNow.AddHours(6).Ticks.ToString(CultureInfo.InvariantCulture)),
         });
 
         return Content(token.RawData);
@@ -114,7 +114,7 @@ public abstract class AuthControllerBase : Controller
 
     protected async Task EnsureBan(string uid, string? primaryUid, string charaIdent)
     {
-        using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();
+        using var dbContext = await DbContextFactory.CreateDbContextAsync();
         if (!dbContext.BannedUsers.Any(c => c.CharacterIdentification == charaIdent))
         {
             dbContext.BannedUsers.Add(new Banned()
@@ -153,7 +153,7 @@ public abstract class AuthControllerBase : Controller
         await dbContext.SaveChangesAsync();
     }
 
-    protected async Task<bool> IsIdentBanned(SinusDbContext dbContext, string charaIdent)
+    protected async Task<bool> IsIdentBanned(LaciDbContext dbContext, string charaIdent)
     {
         return await dbContext.BannedUsers.AsNoTracking().AnyAsync(u => u.CharacterIdentification == charaIdent).ConfigureAwait(false);
     }

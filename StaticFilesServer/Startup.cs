@@ -34,12 +34,12 @@ public class Startup
     {
         Configuration = configuration;
         _logger = logger;
-        var sinusSettings = Configuration.GetRequiredSection("SinusSynchronous");
-        _isDistributionNode = sinusSettings.GetValue(nameof(StaticFilesServerConfiguration.IsDistributionNode), false);
-        _isMain = string.IsNullOrEmpty(sinusSettings.GetValue(nameof(StaticFilesServerConfiguration.MainFileServerAddress), string.Empty)) && _isDistributionNode;
+        var config = Configuration.GetRequiredSection("LaciSynchroni");
+        _isDistributionNode = config.GetValue(nameof(StaticFilesServerConfiguration.IsDistributionNode), false);
+        _isMain = string.IsNullOrEmpty(config.GetValue(nameof(StaticFilesServerConfiguration.MainFileServerAddress), string.Empty)) && _isDistributionNode;
     }
 
-    public IConfiguration Configuration { get; }
+    public Microsoft.Extensions.Configuration.IConfiguration Configuration { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -47,15 +47,15 @@ public class Startup
 
         services.AddLogging();
 
-        services.Configure<StaticFilesServerConfiguration>(Configuration.GetRequiredSection("SinusSynchronous"));
-        services.Configure<SinusConfigurationBase>(Configuration.GetRequiredSection("SinusSynchronous"));
+        services.Configure<StaticFilesServerConfiguration>(Configuration.GetRequiredSection("LaciSynchroni"));
+        services.Configure<LaciConfigurationBase>(Configuration.GetRequiredSection("LaciSynchroni"));
         services.Configure<KestrelServerOptions>(Configuration.GetSection("Kestrel"));
         services.AddSingleton(Configuration);
 
-        var sinusConfig = Configuration.GetRequiredSection("SinusSynchronous");
+        var config = Configuration.GetRequiredSection("LaciSynchroni");
 
         // metrics configuration
-        services.AddSingleton(m => new SinusMetrics(m.GetService<ILogger<SinusMetrics>>(), new List<string>
+        services.AddSingleton(m => new LaciMetrics(m.GetService<ILogger<LaciMetrics>>(), new List<string>
         {
             MetricsAPI.CounterFileRequests,
             MetricsAPI.CounterFileRequestSize
@@ -89,31 +89,31 @@ public class Startup
         services.AddSingleton<RequestQueueService>();
         services.AddHostedService(p => p.GetService<RequestQueueService>());
         services.AddHostedService(m => m.GetService<FileStatisticsService>());
-        services.AddSingleton<IConfigurationService<SinusConfigurationBase>, SinusConfigurationServiceClient<SinusConfigurationBase>>();
-        services.AddHostedService(p => (SinusConfigurationServiceClient<SinusConfigurationBase>)p.GetService<IConfigurationService<SinusConfigurationBase>>());
+        services.AddSingleton<IConfigurationService<LaciConfigurationBase>, LaciConfigurationServiceClient<LaciConfigurationBase>>();
+        services.AddHostedService(p => (LaciConfigurationServiceClient<LaciConfigurationBase>)p.GetService<IConfigurationService<LaciConfigurationBase>>());
 
         // specific services
         if (_isMain)
         {
             services.AddSingleton<IClientReadyMessageService, MainClientReadyMessageService>();
             services.AddHostedService<MainFileCleanupService>();
-            services.AddSingleton<IConfigurationService<StaticFilesServerConfiguration>, SinusConfigurationServiceServer<StaticFilesServerConfiguration>>();
+            services.AddSingleton<IConfigurationService<StaticFilesServerConfiguration>, LaciConfigurationServiceServer<StaticFilesServerConfiguration>>();
             services.AddSingleton<MainServerShardRegistrationService>();
             services.AddHostedService(s => s.GetRequiredService<MainServerShardRegistrationService>());
-            services.AddDbContextPool<SinusDbContext>(options =>
+            services.AddDbContextPool<LaciDbContext>(options =>
             {
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"), builder =>
                 {
                     builder.MigrationsHistoryTable("_efmigrationshistory", "public");
                 }).UseSnakeCaseNamingConvention();
                 options.EnableThreadSafetyChecks(false);
-            }, sinusConfig.GetValue(nameof(SinusConfigurationBase.DbContextPoolSize), 1024));
-            services.AddDbContextFactory<SinusDbContext>(options =>
+            }, config.GetValue(nameof(LaciConfigurationBase.DbContextPoolSize), 1024));
+            services.AddDbContextFactory<LaciDbContext>(options =>
             {
                 options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"), builder =>
                 {
                     builder.MigrationsHistoryTable("_efmigrationshistory", "public");
-                    builder.MigrationsAssembly("SinusSynchronousShared");
+                    builder.MigrationsAssembly("LaciSynchroni.Shared");
                 }).UseSnakeCaseNamingConvention();
                 options.EnableThreadSafetyChecks(false);
             });
@@ -144,7 +144,7 @@ public class Startup
             });
 
             // configure redis for SignalR
-            var redisConnection = sinusConfig.GetValue(nameof(ServerConfiguration.RedisConnectionString), string.Empty);
+            var redisConnection = config.GetValue(nameof(ServerConfiguration.RedisConnectionString), string.Empty);
             signalRServiceBuilder.AddStackExchangeRedis(redisConnection, options => { });
 
             var options = ConfigurationOptions.Parse(redisConnection);
@@ -174,7 +174,7 @@ public class Startup
                     UnreachableServerAction = ServerEnumerationStrategy.UnreachableServerActionOptions.Throw,
                 },
                 MaxValueLength = 1024,
-                PoolSize = sinusConfig.GetValue(nameof(ServerConfiguration.RedisPool), 50),
+                PoolSize = config.GetValue(nameof(ServerConfiguration.RedisPool), 50),
                 SyncTimeout = options.SyncTimeout,
             };
 
@@ -186,8 +186,8 @@ public class Startup
             services.AddHostedService(s => s.GetRequiredService<ShardRegistrationService>());
             services.AddSingleton<IClientReadyMessageService, ShardClientReadyMessageService>();
             services.AddHostedService<ShardFileCleanupService>();
-            services.AddSingleton<IConfigurationService<StaticFilesServerConfiguration>, SinusConfigurationServiceClient<StaticFilesServerConfiguration>>();
-            services.AddHostedService(p => (SinusConfigurationServiceClient<StaticFilesServerConfiguration>)p.GetService<IConfigurationService<StaticFilesServerConfiguration>>());
+            services.AddSingleton<IConfigurationService<StaticFilesServerConfiguration>, LaciConfigurationServiceClient<StaticFilesServerConfiguration>>();
+            services.AddHostedService(p => (LaciConfigurationServiceClient<StaticFilesServerConfiguration>)p.GetService<IConfigurationService<StaticFilesServerConfiguration>>());
         }
 
         services.AddMemoryCache();
@@ -198,7 +198,7 @@ public class Startup
             a.FeatureProviders.Remove(a.FeatureProviders.OfType<ControllerFeatureProvider>().First());
             if (_isMain)
             {
-                a.FeatureProviders.Add(new AllowedControllersFeatureProvider(typeof(SinusStaticFilesServerConfigurationController),
+                a.FeatureProviders.Add(new AllowedControllersFeatureProvider(typeof(LaciStaticFilesServerConfigurationController),
                     typeof(CacheController), typeof(RequestController), typeof(ServerFilesController),
                     typeof(DistributionController), typeof(MainController), typeof(SpeedTestController)));
             }
@@ -214,7 +214,7 @@ public class Startup
 
         // authentication and authorization 
         services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
-            .Configure<IConfigurationService<SinusConfigurationBase>>((o, s) =>
+            .Configure<IConfigurationService<LaciConfigurationBase>>((o, s) =>
             {
                 o.TokenValidationParameters = new()
                 {
@@ -222,9 +222,9 @@ public class Startup
                     ValidateLifetime = true,
                     ValidateAudience = false,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(s.GetValue<string>(nameof(SinusConfigurationBase.Jwt))))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(s.GetValue<string>(nameof(LaciConfigurationBase.Jwt))))
                     {
-                        KeyId = sinusConfig.GetValue<string>(nameof(SinusConfigurationBase.JwtKeyId)),
+                        KeyId = config.GetValue<string>(nameof(LaciConfigurationBase.JwtKeyId)),
                     },
                 };
             });
@@ -237,7 +237,7 @@ public class Startup
         services.AddAuthorization(options =>
         {
             options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-            options.AddPolicy("Internal", new AuthorizationPolicyBuilder().RequireClaim(SinusClaimTypes.Internal, "true").Build());
+            options.AddPolicy("Internal", new AuthorizationPolicyBuilder().RequireClaim(LaciClaimTypes.Internal, "true").Build());
         });
         services.AddSingleton<IUserIdProvider, IdBasedUserIdProvider>();
 
@@ -251,11 +251,11 @@ public class Startup
 
         app.UseRouting();
 
-        var config = app.ApplicationServices.GetRequiredService<IConfigurationService<SinusConfigurationBase>>();
+        var config = app.ApplicationServices.GetRequiredService<IConfigurationService<LaciConfigurationBase>>();
 
 #pragma warning disable IDISP001 // Dispose created
 #pragma warning disable IDISP004 // Don't ignore created IDisposable
-        var metricServer = new KestrelMetricServer(config.GetValueOrDefault<int>(nameof(SinusConfigurationBase.MetricsPort), 4981))
+        var metricServer = new KestrelMetricServer(config.GetValueOrDefault<int>(nameof(LaciConfigurationBase.MetricsPort), 4981))
             .Start();
 #pragma warning restore IDISP004 // Don't ignore created IDisposable
 #pragma warning restore IDISP001 // Dispose created

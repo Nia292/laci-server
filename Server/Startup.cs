@@ -31,13 +31,13 @@ public class Startup
 {
     private readonly ILogger<Startup> _logger;
 
-    public Startup(IConfiguration configuration, ILogger<Startup> logger)
+    public Startup(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<Startup> logger)
     {
         Configuration = configuration;
         _logger = logger;
     }
 
-    public IConfiguration Configuration { get; }
+    public Microsoft.Extensions.Configuration.IConfiguration Configuration { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -45,13 +45,13 @@ public class Startup
 
         services.AddTransient(_ => Configuration);
 
-        var sinusConfig = Configuration.GetRequiredSection("SinusSynchronous");
+        var config = Configuration.GetRequiredSection("LaciSynchroni");
 
         // configure metrics
         ConfigureMetrics(services);
 
         // configure database
-        ConfigureDatabase(services, sinusConfig);
+        ConfigureDatabase(services, config);
 
         // configure authentication and authorization
         ConfigureAuthorization(services);
@@ -60,20 +60,20 @@ public class Startup
         ConfigureIpRateLimiting(services);
 
         // configure SignalR
-        ConfigureSignalR(services, sinusConfig);
+        ConfigureSignalR(services, config);
 
-        // configure sinus specific services
-        ConfigureSinusServices(services, sinusConfig);
+        // configure laci specific services
+        ConfigureLaciServices(services, config);
 
         services.AddHealthChecks();
         services.AddControllers().ConfigureApplicationPartManager(a =>
         {
             a.FeatureProviders.Remove(a.FeatureProviders.OfType<ControllerFeatureProvider>().First());
-            if (sinusConfig.GetValue<Uri>(nameof(ServerConfiguration.MainServerAddress), defaultValue: null) == null)
+            if (config.GetValue<Uri>(nameof(ServerConfiguration.MainServerAddress), defaultValue: null) == null)
             {
                 a.FeatureProviders.Add(new AllowedControllersFeatureProvider(
-                    typeof(SinusServerConfigurationController),
-                    typeof(SinusBaseConfigurationController),
+                    typeof(LaciServerConfigurationController),
+                    typeof(LaciBaseConfigurationController),
                     typeof(ClientMessageController),
                     typeof(ConfigurationController)
                     ));
@@ -85,22 +85,22 @@ public class Startup
         });
     }
 
-    private void ConfigureSinusServices(IServiceCollection services, IConfigurationSection sinusConfig)
+    private void ConfigureLaciServices(IServiceCollection services, IConfigurationSection config)
     {
-        bool isMainServer = sinusConfig.GetValue<Uri>(nameof(ServerConfiguration.MainServerAddress), defaultValue: null) == null;
+        bool isMainServer = config.GetValue<Uri>(nameof(ServerConfiguration.MainServerAddress), defaultValue: null) == null;
 
-        services.Configure<ServerConfiguration>(sinusConfig);
-        services.Configure<SinusConfigurationBase>(sinusConfig);
+        services.Configure<ServerConfiguration>(config);
+        services.Configure<LaciConfigurationBase>(config);
 
         services.AddSingleton<ServerTokenGenerator>();
         services.AddSingleton<SystemInfoService>();
         services.AddSingleton<OnlineSyncedPairCacheService>();
         services.AddHostedService(provider => provider.GetService<SystemInfoService>());
         // configure services based on main server status
-        ConfigureServicesBasedOnShardType(services, sinusConfig, isMainServer);
+        ConfigureServicesBasedOnShardType(services, config, isMainServer);
 
-        services.AddSingleton(s => new SinusCensus(s.GetRequiredService<ILogger<SinusCensus>>()));
-        services.AddHostedService(p => p.GetRequiredService<SinusCensus>());
+        services.AddSingleton(s => new LaciCensus(s.GetRequiredService<ILogger<LaciCensus>>()));
+        services.AddHostedService(p => p.GetRequiredService<LaciCensus>());
 
         if (isMainServer)
         {
@@ -115,7 +115,7 @@ public class Startup
         services.AddHostedService(provider => provider.GetService<GPoseLobbyDistributionService>());
     }
 
-    private static void ConfigureSignalR(IServiceCollection services, IConfigurationSection sinusConfig)
+    private static void ConfigureSignalR(IServiceCollection services, IConfigurationSection config)
     {
         services.AddSingleton<IUserIdProvider, IdBasedUserIdProvider>();
         services.AddSingleton<ConcurrencyFilter>();
@@ -150,7 +150,7 @@ public class Startup
 
 
         // configure redis for SignalR
-        var redisConnection = sinusConfig.GetValue(nameof(ServerConfiguration.RedisConnectionString), string.Empty);
+        var redisConnection = config.GetValue(nameof(ServerConfiguration.RedisConnectionString), string.Empty);
         signalRServiceBuilder.AddStackExchangeRedis(redisConnection, options => { });
 
         var options = ConfigurationOptions.Parse(redisConnection);
@@ -180,7 +180,7 @@ public class Startup
                 UnreachableServerAction = ServerEnumerationStrategy.UnreachableServerActionOptions.Throw,
             },
             MaxValueLength = 1024,
-            PoolSize = sinusConfig.GetValue(nameof(ServerConfiguration.RedisPool), 50),
+            PoolSize = config.GetValue(nameof(ServerConfiguration.RedisPool), 50),
             SyncTimeout = options.SyncTimeout,
         };
 
@@ -203,7 +203,7 @@ public class Startup
         services.AddTransient<IAuthorizationHandler, ValidTokenHubRequirementHandler>();
 
         services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
-            .Configure<IConfigurationService<SinusConfigurationBase>>((options, config) =>
+            .Configure<IConfigurationService<LaciConfigurationBase>>((options, config) =>
             {
                 options.TokenValidationParameters = new()
                 {
@@ -211,9 +211,9 @@ public class Startup
                     ValidateLifetime = true,
                     ValidateAudience = false,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.GetValue<string>(nameof(SinusConfigurationBase.Jwt))))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.GetValue<string>(nameof(LaciConfigurationBase.Jwt))))
                     {
-                        KeyId = config.GetValue<string>(nameof(SinusConfigurationBase.JwtKeyId)),
+                        KeyId = config.GetValue<string>(nameof(LaciConfigurationBase.JwtKeyId)),
                     },
                 };
                 options.Events = new JwtBearerEvents
@@ -261,27 +261,27 @@ public class Startup
                 policy.AddRequirements(new UserRequirement(UserRequirements.Identified | UserRequirements.Moderator | UserRequirements.Administrator));
                 policy.AddRequirements(new ValidTokenRequirement());
             });
-            options.AddPolicy("Internal", new AuthorizationPolicyBuilder().RequireClaim(SinusClaimTypes.Internal, "true").Build());
+            options.AddPolicy("Internal", new AuthorizationPolicyBuilder().RequireClaim(LaciClaimTypes.Internal, "true").Build());
         });
     }
 
-    private void ConfigureDatabase(IServiceCollection services, IConfigurationSection sinusConfig)
+    private void ConfigureDatabase(IServiceCollection services, IConfigurationSection config)
     {
-        services.AddDbContextPool<SinusDbContext>(options =>
+        services.AddDbContextPool<LaciDbContext>(options =>
         {
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"), builder =>
             {
                 builder.MigrationsHistoryTable("_efmigrationshistory", "public");
-                builder.MigrationsAssembly("SinusSynchronousShared");
+                builder.MigrationsAssembly("LaciSynchroni.Shared");
             }).UseSnakeCaseNamingConvention();
             options.EnableThreadSafetyChecks(false);
-        }, sinusConfig.GetValue(nameof(SinusConfigurationBase.DbContextPoolSize), 1024));
-        services.AddDbContextFactory<SinusDbContext>(options =>
+        }, config.GetValue(nameof(LaciConfigurationBase.DbContextPoolSize), 1024));
+        services.AddDbContextFactory<LaciDbContext>(options =>
         {
             options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"), builder =>
             {
                 builder.MigrationsHistoryTable("_efmigrationshistory", "public");
-                builder.MigrationsAssembly("SinusSynchronousShared");
+                builder.MigrationsAssembly("LaciSynchroni.Shared");
             }).UseSnakeCaseNamingConvention();
             options.EnableThreadSafetyChecks(false);
         });
@@ -289,7 +289,7 @@ public class Startup
 
     private static void ConfigureMetrics(IServiceCollection services)
     {
-        services.AddSingleton<SinusMetrics>(m => new SinusMetrics(m.GetService<ILogger<SinusMetrics>>(), new List<string>
+        services.AddSingleton<LaciMetrics>(m => new LaciMetrics(m.GetService<ILogger<LaciMetrics>>(), new List<string>
         {
             MetricsAPI.CounterInitializedConnections,
             MetricsAPI.CounterUserPushData,
@@ -324,20 +324,20 @@ public class Startup
         }));
     }
 
-    private static void ConfigureServicesBasedOnShardType(IServiceCollection services, IConfigurationSection sinusConfig, bool isMainServer)
+    private static void ConfigureServicesBasedOnShardType(IServiceCollection services, IConfigurationSection config, bool isMainServer)
     {
         if (!isMainServer)
         {
-            services.AddSingleton<IConfigurationService<ServerConfiguration>, SinusConfigurationServiceClient<ServerConfiguration>>();
-            services.AddSingleton<IConfigurationService<SinusConfigurationBase>, SinusConfigurationServiceClient<SinusConfigurationBase>>();
+            services.AddSingleton<IConfigurationService<ServerConfiguration>, LaciConfigurationServiceClient<ServerConfiguration>>();
+            services.AddSingleton<IConfigurationService<LaciConfigurationBase>, LaciConfigurationServiceClient<LaciConfigurationBase>>();
 
-            services.AddHostedService(p => (SinusConfigurationServiceClient<ServerConfiguration>)p.GetService<IConfigurationService<ServerConfiguration>>());
-            services.AddHostedService(p => (SinusConfigurationServiceClient<SinusConfigurationBase>)p.GetService<IConfigurationService<SinusConfigurationBase>>());
+            services.AddHostedService(p => (LaciConfigurationServiceClient<ServerConfiguration>)p.GetService<IConfigurationService<ServerConfiguration>>());
+            services.AddHostedService(p => (LaciConfigurationServiceClient<LaciConfigurationBase>)p.GetService<IConfigurationService<LaciConfigurationBase>>());
         }
         else
         {
-            services.AddSingleton<IConfigurationService<ServerConfiguration>, SinusConfigurationServiceServer<ServerConfiguration>>();
-            services.AddSingleton<IConfigurationService<SinusConfigurationBase>, SinusConfigurationServiceServer<SinusConfigurationBase>>();
+            services.AddSingleton<IConfigurationService<ServerConfiguration>, LaciConfigurationServiceServer<ServerConfiguration>>();
+            services.AddSingleton<IConfigurationService<LaciConfigurationBase>, LaciConfigurationServiceServer<LaciConfigurationBase>>();
         }
     }
 
@@ -345,7 +345,7 @@ public class Startup
     {
         logger.LogInformation("Running Configure");
 
-        var config = app.ApplicationServices.GetRequiredService<IConfigurationService<SinusConfigurationBase>>();
+        var config = app.ApplicationServices.GetRequiredService<IConfigurationService<LaciConfigurationBase>>();
 
         app.UseIpRateLimiting();
 
@@ -354,7 +354,7 @@ public class Startup
         app.UseWebSockets();
         app.UseHttpMetrics();
 
-        var metricServer = new KestrelMetricServer(config.GetValueOrDefault<int>(nameof(SinusConfigurationBase.MetricsPort), 4980));
+        var metricServer = new KestrelMetricServer(config.GetValueOrDefault<int>(nameof(LaciConfigurationBase.MetricsPort), 4980));
         metricServer.Start();
 
         app.UseAuthentication();

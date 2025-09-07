@@ -8,12 +8,12 @@ using System.Collections.Concurrent;
 namespace LaciSynchroni.Shared.RequirementHandlers;
 public class ExistingUserRequirementHandler : AuthorizationHandler<ExistingUserRequirement>
 {
-    private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
     private readonly ILogger<ExistingUserRequirementHandler> _logger;
     private readonly static ConcurrentDictionary<string, (bool Exists, DateTime LastCheck)> _existingUserDict = [];
     private readonly static ConcurrentDictionary<ulong, (bool Exists, DateTime LastCheck)> _existingDiscordDict = [];
 
-    public ExistingUserRequirementHandler(IDbContextFactory<SinusDbContext> dbContext, ILogger<ExistingUserRequirementHandler> logger)
+    public ExistingUserRequirementHandler(IDbContextFactory<LaciDbContext> dbContext, ILogger<ExistingUserRequirementHandler> logger)
     {
         _dbContextFactory = dbContext;
         _logger = logger;
@@ -23,7 +23,7 @@ public class ExistingUserRequirementHandler : AuthorizationHandler<ExistingUserR
     {
         try
         {
-            var uid = context.User.Claims.SingleOrDefault(g => string.Equals(g.Type, SinusClaimTypes.Uid, StringComparison.Ordinal))?.Value;
+            var uid = context.User.Claims.SingleOrDefault(g => string.Equals(g.Type, LaciClaimTypes.Uid, StringComparison.Ordinal))?.Value;
             if (uid == null)
             {
                 context.Fail();
@@ -31,7 +31,7 @@ public class ExistingUserRequirementHandler : AuthorizationHandler<ExistingUserR
                 return;
             }
 
-            var discordIdString = context.User.Claims.SingleOrDefault(g => string.Equals(g.Type, SinusClaimTypes.DiscordId, StringComparison.Ordinal))?.Value;
+            var discordIdString = context.User.Claims.SingleOrDefault(g => string.Equals(g.Type, LaciClaimTypes.DiscordId, StringComparison.Ordinal))?.Value;
             if (discordIdString == null)
             {
                 context.Fail();
@@ -55,7 +55,7 @@ public class ExistingUserRequirementHandler : AuthorizationHandler<ExistingUserR
             }
             if (!existingUser.Exists)
             {
-                _logger.LogWarning("Failed to find Sinus User {User} in DB", uid);
+                _logger.LogWarning("Failed to find Laci User {User} in DB", uid);
                 context.Fail();
                 return;
             }

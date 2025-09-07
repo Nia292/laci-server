@@ -2,7 +2,7 @@
 
 namespace LaciSynchroni.Shared.Utils.Configuration;
 
-public class ServicesConfiguration : SinusConfigurationBase
+public class ServicesConfiguration : LaciConfigurationBase
 {
     public string DiscordBotToken { get; set; } = string.Empty;
     public ulong? DiscordChannelForMessages { get; set; } = null;
@@ -16,7 +16,7 @@ public class ServicesConfiguration : SinusConfigurationBase
     public ulong? DiscordRegistrationRole { get; set; } = null!;
     public int SecondaryUIDLimit { get; set; } = 5;
     [RemoteConfiguration]
-    public string ServerName { get; set; } = "Sinus Synchronous";
+    public string ServerName { get; set; } = "Laci Synchroni";
 
     public override string ToString()
     {

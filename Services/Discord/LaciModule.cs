@@ -13,21 +13,21 @@ using System.Net.Http.Headers;
 
 namespace LaciSynchroni.Services.Discord;
 
-public class SinusModule : InteractionModuleBase
+public class LaciModule : InteractionModuleBase
 {
-    private readonly ILogger<SinusModule> _logger;
+    private readonly ILogger<LaciModule> _logger;
     private readonly IServiceProvider _services;
-    private readonly IConfigurationService<ServicesConfiguration> _sinusServicesConfiguration;
+    private readonly IConfigurationService<ServicesConfiguration> _servicesConfig;
     private readonly IConnectionMultiplexer _connectionMultiplexer;
     private readonly ServerTokenGenerator _serverTokenGenerator;
 
-    public SinusModule(ILogger<SinusModule> logger, IServiceProvider services,
-        IConfigurationService<ServicesConfiguration> sinusServicesConfiguration,
+    public LaciModule(ILogger<LaciModule> logger, IServiceProvider services,
+        IConfigurationService<ServicesConfiguration> servicesConfig,
         IConnectionMultiplexer connectionMultiplexer, ServerTokenGenerator serverTokenGenerator)
     {
         _logger = logger;
         _services = services;
-        _sinusServicesConfiguration = sinusServicesConfiguration;
+        _servicesConfig = servicesConfig;
         _connectionMultiplexer = connectionMultiplexer;
         _serverTokenGenerator = serverTokenGenerator;
     }
@@ -89,7 +89,7 @@ public class SinusModule : InteractionModuleBase
         _logger.LogInformation("SlashCommand:{userId}:{Method}:{message}:{type}:{uid}", Context.Interaction.User.Id, nameof(SendMessageToClients), message, messageType, uid);
 
         using var scope = _services.CreateScope();
-        using var db = scope.ServiceProvider.GetService<SinusDbContext>();
+        using var db = scope.ServiceProvider.GetService<LaciDbContext>();
 
         if (!(await db.LodeStoneAuth.Include(u => u.User).SingleOrDefaultAsync(a => a.DiscordId == Context.Interaction.User.Id))?.User?.IsAdmin ?? true)
         {
@@ -107,11 +107,11 @@ public class SinusModule : InteractionModuleBase
         {
             using HttpClient c = new HttpClient();
             c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _serverTokenGenerator.Token);
-            await c.PostAsJsonAsync(new Uri(_sinusServicesConfiguration.GetValue<Uri>
+            await c.PostAsJsonAsync(new Uri(_servicesConfig.GetValue<Uri>
                 (nameof(ServicesConfiguration.MainServerAddress)), "/msgc/sendMessage"), new ClientMessage(messageType, message, uid ?? string.Empty))
                 .ConfigureAwait(false);
 
-            var discordChannelForMessages = _sinusServicesConfiguration.GetValueOrDefault<ulong?>(nameof(ServicesConfiguration.DiscordChannelForMessages), null);
+            var discordChannelForMessages = _servicesConfig.GetValueOrDefault<ulong?>(nameof(ServicesConfiguration.DiscordChannelForMessages), null);
             if (uid == null && discordChannelForMessages != null)
             {
                 var discordChannel = await Context.Guild.GetChannelAsync(discordChannelForMessages.Value) as IMessageChannel;
@@ -147,7 +147,7 @@ public class SinusModule : InteractionModuleBase
         var embed = new EmbedBuilder();
 
         using var scope = _services.CreateScope();
-        using var db = scope.ServiceProvider.GetService<SinusDbContext>();
+        using var db = scope.ServiceProvider.GetService<LaciDbContext>();
         if (!(await db.LodeStoneAuth.Include(u => u.User).SingleOrDefaultAsync(a => a.DiscordId == discordUserId))?.User?.IsAdmin ?? true)
         {
             embed.WithTitle("Failed to add user");
@@ -191,7 +191,7 @@ public class SinusModule : InteractionModuleBase
     {
         bool showForSecondaryUser = secondaryUserUid != null;
         using var scope = _services.CreateScope();
-        await using var db = scope.ServiceProvider.GetRequiredService<SinusDbContext>();
+        await using var db = scope.ServiceProvider.GetRequiredService<LaciDbContext>();
 
         var primaryUser = await db.LodeStoneAuth.Include(u => u.User).SingleOrDefaultAsync(u => u.DiscordId == id).ConfigureAwait(false);
 
@@ -200,7 +200,7 @@ public class SinusModule : InteractionModuleBase
         if (primaryUser == null)
         {
             eb.WithTitle("No account");
-            eb.WithDescription("No Sinus account was found associated to your Discord user");
+            eb.WithDescription("No account was found associated to your Discord user");
             return eb;
         }
 
@@ -227,7 +227,7 @@ public class SinusModule : InteractionModuleBase
             if (userInDb == null)
             {
                 eb.WithTitle("No account");
-                eb.WithDescription("The Discord user has no valid Sinus account");
+                eb.WithDescription("The Discord user has no valid account");
                 return eb;
             }
 

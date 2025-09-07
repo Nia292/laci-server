@@ -3,11 +3,11 @@ using Prometheus;
 
 namespace LaciSynchroni.Shared.Metrics;
 
-public class SinusMetrics
+public class LaciMetrics
 {
-    public SinusMetrics(ILogger<SinusMetrics> logger, List<string> countersToServe, List<string> gaugesToServe)
+    public LaciMetrics(ILogger<LaciMetrics> logger, List<string> countersToServe, List<string> gaugesToServe)
     {
-        logger.LogInformation("Initializing SinusMetrics");
+        logger.LogInformation("Initializing LaciMetrics");
         foreach (var counter in countersToServe)
         {
             logger.LogInformation($"Creating Metric for Counter {counter}");

@@ -3,12 +3,12 @@ using System.Runtime.CompilerServices;
 
 namespace LaciSynchroni.Server.Utils;
 
-public class SinusHubLogger
+public class ServerHubLogger
 {
     private readonly ServerHub _hub;
     private readonly ILogger<ServerHub> _logger;
 
-    public SinusHubLogger(ServerHub hub, ILogger<ServerHub> logger)
+    public ServerHubLogger(ServerHub hub, ILogger<ServerHub> logger)
     {
         _hub = hub;
         _logger = logger;

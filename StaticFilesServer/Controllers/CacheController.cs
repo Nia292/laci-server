@@ -25,9 +25,9 @@ public class CacheController : ControllerBase
     [HttpGet(FilesRoutes.Cache_Get)]
     public async Task<IActionResult> GetFiles(Guid requestId)
     {
-        _logger.LogDebug($"GetFile:{SinusUser}:{requestId}");
+        _logger.LogDebug($"GetFile:{LaciUser}:{requestId}");
 
-        if (!_requestQueue.IsActiveProcessing(requestId, SinusUser, out var request)) return BadRequest();
+        if (!_requestQueue.IsActiveProcessing(requestId, LaciUser, out var request)) return BadRequest();
 
         _requestQueue.ActivateRequest(requestId);
 

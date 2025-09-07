@@ -11,7 +11,7 @@ namespace LaciSynchroni.Shared.Utils;
 
 public class ServerTokenGenerator
 {
-    private readonly IOptionsMonitor<SinusConfigurationBase> _configuration;
+    private readonly IOptionsMonitor<LaciConfigurationBase> _configuration;
     private readonly ILogger<ServerTokenGenerator> _logger;
 
     private Dictionary<string, string> _tokenDictionary { get; set; } = new(StringComparer.Ordinal);
@@ -29,7 +29,7 @@ public class ServerTokenGenerator
         }
     }
 
-    public ServerTokenGenerator(IOptionsMonitor<SinusConfigurationBase> configuration, ILogger<ServerTokenGenerator> logger)
+    public ServerTokenGenerator(IOptionsMonitor<LaciConfigurationBase> configuration, ILogger<ServerTokenGenerator> logger)
     {
         _configuration = configuration;
         _logger = logger;
@@ -44,9 +44,9 @@ public class ServerTokenGenerator
         {
             Subject = new ClaimsIdentity(new List<Claim>()
             {
-                new Claim(SinusClaimTypes.Uid, _configuration.CurrentValue.ShardName),
-                new Claim(SinusClaimTypes.Internal, "true"),
-                new Claim(SinusClaimTypes.Expires, DateTime.Now.AddYears(1).Ticks.ToString(CultureInfo.InvariantCulture))
+                new Claim(LaciClaimTypes.Uid, _configuration.CurrentValue.ShardName),
+                new Claim(LaciClaimTypes.Internal, "true"),
+                new Claim(LaciClaimTypes.Expires, DateTime.Now.AddYears(1).Ticks.ToString(CultureInfo.InvariantCulture))
             }),
             SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256Signature),
             Expires = DateTime.Now.AddYears(1)

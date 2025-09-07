@@ -15,7 +15,7 @@ public class Program
         using (var scope = host.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
-            var factory = services.GetRequiredService<IDbContextFactory<SinusDbContext>>();
+            var factory = services.GetRequiredService<IDbContextFactory<LaciDbContext>>();
             using var context = factory.CreateDbContext();
             var options = services.GetRequiredService<IConfigurationService<ServerConfiguration>>();
             var logger = host.Services.GetRequiredService<ILogger<Program>>();
@@ -36,7 +36,7 @@ public class Program
 
                 logger.LogInformation(options.ToString());
             }
-            var metrics = services.GetRequiredService<SinusMetrics>();
+            var metrics = services.GetRequiredService<LaciMetrics>();
 
             metrics.SetGaugeTo(MetricsAPI.GaugeUsersRegistered, context.Users.AsNoTracking().Count());
             metrics.SetGaugeTo(MetricsAPI.GaugePairs, context.ClientPairs.AsNoTracking().Count());

@@ -23,10 +23,10 @@ namespace LaciSynchroni.AuthService;
 
 public class Startup
 {
-    private readonly IConfiguration _configuration;
+    private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
     private ILogger<Startup> _logger;
 
-    public Startup(IConfiguration configuration, ILogger<Startup> logger)
+    public Startup(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<Startup> logger)
     {
         _configuration = configuration;
         _logger = logger;
@@ -34,7 +34,7 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
     {
-        var config = app.ApplicationServices.GetRequiredService<IConfigurationService<SinusConfigurationBase>>();
+        var config = app.ApplicationServices.GetRequiredService<IConfigurationService<LaciConfigurationBase>>();
 
         app.UseRouting();
 
@@ -43,7 +43,7 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
 
-        KestrelMetricServer metricServer = new KestrelMetricServer(config.GetValueOrDefault<int>(nameof(SinusConfigurationBase.MetricsPort), 4985));
+        KestrelMetricServer metricServer = new KestrelMetricServer(config.GetValueOrDefault<int>(nameof(LaciConfigurationBase.MetricsPort), 4985));
         metricServer.Start();
 
         app.UseEndpoints(endpoints =>
@@ -60,25 +60,25 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        var sinusConfig = _configuration.GetRequiredSection("SinusSynchronous");
+        var config = _configuration.GetRequiredSection("LaciSynchroni");
 
         services.AddHttpContextAccessor();
 
-        ConfigureRedis(services, sinusConfig);
+        ConfigureRedis(services, config);
 
         services.AddSingleton<SecretKeyAuthenticatorService>();
         services.AddSingleton<GeoIPService>();
 
         services.AddHostedService(provider => provider.GetRequiredService<GeoIPService>());
 
-        services.Configure<AuthServiceConfiguration>(sinusConfig);
-        services.Configure<SinusConfigurationBase>(sinusConfig);
+        services.Configure<AuthServiceConfiguration>(config);
+        services.Configure<LaciConfigurationBase>(config);
 
         services.AddSingleton<ServerTokenGenerator>();
 
         ConfigureAuthorization(services);
 
-        ConfigureDatabase(services, sinusConfig);
+        ConfigureDatabase(services, config);
 
         ConfigureConfigServices(services);
 
@@ -99,7 +99,7 @@ public class Startup
         services.AddTransient<IAuthorizationHandler, ExistingUserRequirementHandler>();
 
         services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
-            .Configure<IConfigurationService<SinusConfigurationBase>>((options, config) =>
+            .Configure<IConfigurationService<LaciConfigurationBase>>((options, config) =>
             {
                 options.TokenValidationParameters = new()
                 {
@@ -107,9 +107,9 @@ public class Startup
                     ValidateLifetime = true,
                     ValidateAudience = false,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.GetValue<string>(nameof(SinusConfigurationBase.Jwt))))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(config.GetValue<string>(nameof(LaciConfigurationBase.Jwt))))
                     {
-                        KeyId = config.GetValue<string>(nameof(SinusConfigurationBase.JwtKeyId)),
+                        KeyId = config.GetValue<string>(nameof(LaciConfigurationBase.JwtKeyId)),
                     },
                 };
             });
@@ -131,7 +131,7 @@ public class Startup
                 policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
                 policy.AddRequirements(new ValidTokenRequirement());
                 policy.AddRequirements(new ExistingUserRequirement());
-                policy.RequireClaim(SinusClaimTypes.OAuthLoginToken, "True");
+                policy.RequireClaim(LaciClaimTypes.OAuthLoginToken, "True");
             });
             options.AddPolicy("Authenticated", policy =>
             {
@@ -156,13 +156,13 @@ public class Startup
                 policy.AddRequirements(new UserRequirement(UserRequirements.Identified | UserRequirements.Moderator | UserRequirements.Administrator));
                 policy.AddRequirements(new ValidTokenRequirement());
             });
-            options.AddPolicy("Internal", new AuthorizationPolicyBuilder().RequireClaim(SinusClaimTypes.Internal, "true").Build());
+            options.AddPolicy("Internal", new AuthorizationPolicyBuilder().RequireClaim(LaciClaimTypes.Internal, "true").Build());
         });
     }
 
     private static void ConfigureMetrics(IServiceCollection services)
     {
-        services.AddSingleton<SinusMetrics>(m => new SinusMetrics(m.GetService<ILogger<SinusMetrics>>(), new List<string>
+        services.AddSingleton<LaciMetrics>(m => new LaciMetrics(m.GetService<ILogger<LaciMetrics>>(), new List<string>
         {
             MetricsAPI.CounterAuthenticationCacheHits,
             MetricsAPI.CounterAuthenticationFailures,
@@ -174,10 +174,10 @@ public class Startup
         }));
     }
 
-    private void ConfigureRedis(IServiceCollection services, IConfigurationSection sinusConfig)
+    private void ConfigureRedis(IServiceCollection services, IConfigurationSection config)
     {
         // configure redis for SignalR
-        var redisConnection = sinusConfig.GetValue(nameof(ServerConfiguration.RedisConnectionString), string.Empty);
+        var redisConnection = config.GetValue(nameof(ServerConfiguration.RedisConnectionString), string.Empty);
         var options = ConfigurationOptions.Parse(redisConnection);
 
         var endpoint = options.EndPoints[0];
@@ -195,13 +195,13 @@ public class Startup
     }
     private void ConfigureConfigServices(IServiceCollection services)
     {
-        services.AddSingleton<IConfigurationService<AuthServiceConfiguration>, SinusConfigurationServiceServer<AuthServiceConfiguration>>();
-        services.AddSingleton<IConfigurationService<SinusConfigurationBase>, SinusConfigurationServiceServer<SinusConfigurationBase>>();
+        services.AddSingleton<IConfigurationService<AuthServiceConfiguration>, LaciConfigurationServiceServer<AuthServiceConfiguration>>();
+        services.AddSingleton<IConfigurationService<LaciConfigurationBase>, LaciConfigurationServiceServer<LaciConfigurationBase>>();
     }
 
-    private void ConfigureDatabase(IServiceCollection services, IConfigurationSection sinusConfig)
+    private void ConfigureDatabase(IServiceCollection services, IConfigurationSection config)
     {
-        services.AddDbContextPool<SinusDbContext>(options =>
+        services.AddDbContextPool<LaciDbContext>(options =>
         {
             options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"), builder =>
             {
@@ -209,8 +209,8 @@ public class Startup
                 builder.MigrationsAssembly("LaciSynchroni.Shared");
             }).UseSnakeCaseNamingConvention();
             options.EnableThreadSafetyChecks(false);
-        }, sinusConfig.GetValue(nameof(SinusConfigurationBase.DbContextPoolSize), 1024));
-        services.AddDbContextFactory<SinusDbContext>(options =>
+        }, config.GetValue(nameof(LaciConfigurationBase.DbContextPoolSize), 1024));
+        services.AddDbContextFactory<LaciDbContext>(options =>
         {
             options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"), builder =>
             {

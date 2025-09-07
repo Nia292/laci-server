@@ -13,18 +13,18 @@ namespace LaciSynchroni.Server.Services;
 
 public sealed class SystemInfoService : BackgroundService
 {
-    private readonly SinusMetrics _sinusMetrics;
+    private readonly LaciMetrics _metrics;
     private readonly IConfigurationService<ServerConfiguration> _config;
-    private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
     private readonly ILogger<SystemInfoService> _logger;
     private readonly IHubContext<ServerHub, IServerHub> _hubContext;
     private readonly IRedisDatabase _redis;
     public SystemInfoDto SystemInfoDto { get; private set; } = new();
 
-    public SystemInfoService(SinusMetrics sinusMetrics, IConfigurationService<ServerConfiguration> configurationService, IDbContextFactory<SinusDbContext> dbContextFactory,
+    public SystemInfoService(LaciMetrics metrics, IConfigurationService<ServerConfiguration> configurationService, IDbContextFactory<LaciDbContext> dbContextFactory,
         ILogger<SystemInfoService> logger, IHubContext<ServerHub, IServerHub> hubContext, IRedisDatabase redisDb)
     {
-        _sinusMetrics = sinusMetrics;
+        _metrics = metrics;
         _config = configurationService;
         _dbContextFactory = dbContextFactory;
         _logger = logger;
@@ -48,8 +48,8 @@ public sealed class SystemInfoService : BackgroundService
             {
                 ThreadPool.GetAvailableThreads(out int workerThreads, out int ioThreads);
 
-                _sinusMetrics.SetGaugeTo(MetricsAPI.GaugeAvailableWorkerThreads, workerThreads);
-                _sinusMetrics.SetGaugeTo(MetricsAPI.GaugeAvailableIOWorkerThreads, ioThreads);
+                _metrics.SetGaugeTo(MetricsAPI.GaugeAvailableWorkerThreads, workerThreads);
+                _metrics.SetGaugeTo(MetricsAPI.GaugeAvailableIOWorkerThreads, ioThreads);
 
                 var onlineUsers = (_redis.SearchKeysAsync("UID:*").GetAwaiter().GetResult()).Count();
                 SystemInfoDto = new SystemInfoDto()
@@ -65,12 +65,12 @@ public sealed class SystemInfoService : BackgroundService
 
                     using var db = await _dbContextFactory.CreateDbContextAsync(ct).ConfigureAwait(false);
 
-                    _sinusMetrics.SetGaugeTo(MetricsAPI.GaugeAuthorizedConnections, onlineUsers);
-                    _sinusMetrics.SetGaugeTo(MetricsAPI.GaugePairs, db.ClientPairs.AsNoTracking().Count());
-                    _sinusMetrics.SetGaugeTo(MetricsAPI.GaugePairsPaused, db.Permissions.AsNoTracking().Where(p => p.IsPaused).Count());
-                    _sinusMetrics.SetGaugeTo(MetricsAPI.GaugeGroups, db.Groups.AsNoTracking().Count());
-                    _sinusMetrics.SetGaugeTo(MetricsAPI.GaugeGroupPairs, db.GroupPairs.AsNoTracking().Count());
-                    _sinusMetrics.SetGaugeTo(MetricsAPI.GaugeUsersRegistered, db.Users.AsNoTracking().Count());
+                    _metrics.SetGaugeTo(MetricsAPI.GaugeAuthorizedConnections, onlineUsers);
+                    _metrics.SetGaugeTo(MetricsAPI.GaugePairs, db.ClientPairs.AsNoTracking().Count());
+                    _metrics.SetGaugeTo(MetricsAPI.GaugePairsPaused, db.Permissions.AsNoTracking().Where(p => p.IsPaused).Count());
+                    _metrics.SetGaugeTo(MetricsAPI.GaugeGroups, db.Groups.AsNoTracking().Count());
+                    _metrics.SetGaugeTo(MetricsAPI.GaugeGroupPairs, db.GroupPairs.AsNoTracking().Count());
+                    _metrics.SetGaugeTo(MetricsAPI.GaugeUsersRegistered, db.Users.AsNoTracking().Count());
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(timeOut), ct).ConfigureAwait(false);

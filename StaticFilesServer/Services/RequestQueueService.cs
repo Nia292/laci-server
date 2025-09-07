@@ -12,7 +12,7 @@ public class RequestQueueService : IHostedService
     private readonly IClientReadyMessageService _clientReadyMessageService;
     private readonly CachedFileProvider _cachedFileProvider;
     private readonly ILogger<RequestQueueService> _logger;
-    private readonly SinusMetrics _metrics;
+    private readonly LaciMetrics _metrics;
     private readonly ConcurrentQueue<UserRequest> _queue = new();
     private readonly ConcurrentQueue<UserRequest> _priorityQueue = new();
     private readonly int _queueExpirationSeconds;
@@ -22,7 +22,7 @@ public class RequestQueueService : IHostedService
     private readonly int _queueReleaseSeconds;
     private System.Timers.Timer _queueTimer;
 
-    public RequestQueueService(SinusMetrics metrics, IConfigurationService<StaticFilesServerConfiguration> configurationService,
+    public RequestQueueService(LaciMetrics metrics, IConfigurationService<StaticFilesServerConfiguration> configurationService,
         ILogger<RequestQueueService> logger, IClientReadyMessageService hubContext, CachedFileProvider cachedFileProvider)
     {
         _userQueueRequests = new UserQueueEntry[configurationService.GetValueOrDefault(nameof(StaticFilesServerConfiguration.DownloadQueueSize), 50)];

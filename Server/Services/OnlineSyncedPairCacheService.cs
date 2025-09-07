@@ -8,13 +8,13 @@ public class OnlineSyncedPairCacheService
     private readonly SemaphoreSlim _cacheModificationSemaphore = new(1);
     private readonly ILogger<OnlineSyncedPairCacheService> _logger;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly SinusMetrics _sinusMetrics;
+    private readonly LaciMetrics _metrics;
 
-    public OnlineSyncedPairCacheService(ILogger<OnlineSyncedPairCacheService> logger, ILoggerFactory loggerFactory, SinusMetrics sinusMetrics)
+    public OnlineSyncedPairCacheService(ILogger<OnlineSyncedPairCacheService> logger, ILoggerFactory loggerFactory, LaciMetrics metrics)
     {
         _logger = logger;
         _loggerFactory = loggerFactory;
-        _sinusMetrics = sinusMetrics;
+        _metrics = metrics;
     }
 
     public async Task InitPlayer(string user)
@@ -25,7 +25,7 @@ public class OnlineSyncedPairCacheService
         try
         {
             _logger.LogDebug("Initializing {user}", user);
-            _lastSeenCache[user] = new(_loggerFactory.CreateLogger<PairCache>(), user, _sinusMetrics);
+            _lastSeenCache[user] = new(_loggerFactory.CreateLogger<PairCache>(), user, _metrics);
         }
         finally
         {
@@ -70,11 +70,11 @@ public class OnlineSyncedPairCacheService
     {
         private readonly ILogger<PairCache> _logger;
         private readonly string _owner;
-        private readonly SinusMetrics _metrics;
+        private readonly LaciMetrics _metrics;
         private readonly Dictionary<string, DateTime> _lastSeenCache = new(StringComparer.Ordinal);
         private readonly SemaphoreSlim _lock = new(1);
 
-        public PairCache(ILogger<PairCache> logger, string owner, SinusMetrics metrics)
+        public PairCache(ILogger<PairCache> logger, string owner, LaciMetrics metrics)
         {
             metrics.IncGauge(MetricsAPI.GaugeUserPairCacheUsers);
             _logger = logger;

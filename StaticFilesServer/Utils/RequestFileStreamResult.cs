@@ -8,15 +8,15 @@ public class RequestFileStreamResult : FileStreamResult
 {
     private readonly Guid _requestId;
     private readonly RequestQueueService _requestQueueService;
-    private readonly SinusMetrics _sinusMetrics;
+    private readonly LaciMetrics _metrics;
 
-    public RequestFileStreamResult(Guid requestId, RequestQueueService requestQueueService, SinusMetrics sinusMetrics,
+    public RequestFileStreamResult(Guid requestId, RequestQueueService requestQueueService, LaciMetrics metrics,
         Stream fileStream, string contentType) : base(fileStream, contentType)
     {
         _requestId = requestId;
         _requestQueueService = requestQueueService;
-        _sinusMetrics = sinusMetrics;
-        _sinusMetrics.IncGauge(MetricsAPI.GaugeCurrentDownloads);
+        _metrics = metrics;
+        _metrics.IncGauge(MetricsAPI.GaugeCurrentDownloads);
     }
 
     public override void ExecuteResult(ActionContext context)
@@ -33,7 +33,7 @@ public class RequestFileStreamResult : FileStreamResult
         {
             _requestQueueService.FinishRequest(_requestId);
 
-            _sinusMetrics.DecGauge(MetricsAPI.GaugeCurrentDownloads);
+            _metrics.DecGauge(MetricsAPI.GaugeCurrentDownloads);
             FileStream?.Dispose();
         }
     }
@@ -51,7 +51,7 @@ public class RequestFileStreamResult : FileStreamResult
         finally
         {
             _requestQueueService.FinishRequest(_requestId);
-            _sinusMetrics.DecGauge(MetricsAPI.GaugeCurrentDownloads);
+            _metrics.DecGauge(MetricsAPI.GaugeCurrentDownloads);
             FileStream?.Dispose();
         }
     }

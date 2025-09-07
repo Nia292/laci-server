@@ -12,25 +12,25 @@ using System.Text.RegularExpressions;
 
 namespace LaciSynchroni.Services.Discord;
 
-public partial class SinusWizardModule : InteractionModuleBase
+public partial class LaciWizardModule : InteractionModuleBase
 {
-    private ILogger<SinusModule> _logger;
+    private ILogger<LaciModule> _logger;
     private DiscordBotServices _botServices;
-    private IConfigurationService<ServerConfiguration> _sinusClientConfigurationService;
-    private IConfigurationService<ServicesConfiguration> _sinusServicesConfiguration;
+    private IConfigurationService<ServerConfiguration> _serverConfig;
+    private IConfigurationService<ServicesConfiguration> _servicesConfig;
     private IConnectionMultiplexer _connectionMultiplexer;
-    private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
     private Random random = new();
 
-    public SinusWizardModule(ILogger<SinusModule> logger, DiscordBotServices botServices,
-        IConfigurationService<ServerConfiguration> sinusClientConfigurationService,
-        IConfigurationService<ServicesConfiguration> sinusServicesConfiguration,
-        IConnectionMultiplexer connectionMultiplexer, IDbContextFactory<SinusDbContext> dbContextFactory)
+    public LaciWizardModule(ILogger<LaciModule> logger, DiscordBotServices botServices,
+        IConfigurationService<ServerConfiguration> serverConfig,
+        IConfigurationService<ServicesConfiguration> servicesConfig,
+        IConnectionMultiplexer connectionMultiplexer, IDbContextFactory<LaciDbContext> dbContextFactory)
     {
         _logger = logger;
         _botServices = botServices;
-        _sinusClientConfigurationService = sinusClientConfigurationService;
-        _sinusServicesConfiguration = sinusServicesConfiguration;
+        _serverConfig = serverConfig;
+        _servicesConfig = servicesConfig;
         _connectionMultiplexer = connectionMultiplexer;
         _dbContextFactory = dbContextFactory;
     }
@@ -68,7 +68,7 @@ public partial class SinusWizardModule : InteractionModuleBase
             _ => "unknown",
         };
 
-        eb.WithTitle("Sinus Bot Services Captcha");
+        eb.WithTitle("Laci Bot Services Captcha");
         eb.WithDescription("You are seeing this embed because you interact with this bot for the first time since the bot has been restarted." + Environment.NewLine + Environment.NewLine
             + "This bot __requires__ embeds for its function. To proceed, please verify you have embeds enabled." + Environment.NewLine
             + $"## To verify you have embeds enabled __press on the **{nthButtonText}** button ({nthButtonEmoji}).__");
@@ -132,12 +132,12 @@ public partial class SinusWizardModule : InteractionModuleBase
 
         _logger.LogInformation("{method}:{userId}", nameof(StartWizard), Context.Interaction.User.Id);
 
-        using var sinusDb = await GetDbContext().ConfigureAwait(false);
-        bool hasAccount = await sinusDb.LodeStoneAuth.AnyAsync(u => u.DiscordId == Context.User.Id && u.StartedAt == null).ConfigureAwait(false);
+        using var db = await GetDbContext().ConfigureAwait(false);
+        bool hasAccount = await db.LodeStoneAuth.AnyAsync(u => u.DiscordId == Context.User.Id && u.StartedAt == null).ConfigureAwait(false);
 
         if (init)
         {
-            bool isBanned = await sinusDb.BannedRegistrations.AnyAsync(u => u.DiscordIdOrLodestoneAuth == Context.User.Id.ToString()).ConfigureAwait(false);
+            bool isBanned = await db.BannedRegistrations.AnyAsync(u => u.DiscordIdOrLodestoneAuth == Context.User.Id.ToString()).ConfigureAwait(false);
 
             if (isBanned)
             {
@@ -149,7 +149,7 @@ public partial class SinusWizardModule : InteractionModuleBase
             }
         }
 
-        var serverName = _sinusServicesConfiguration.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Sinus Synchronous");
+        var serverName = _servicesConfig.GetValueOrDefault(nameof(ServicesConfiguration.ServerName), "Laci Synchroni");
 
         EmbedBuilder eb = new();
         eb.WithTitle($"Welcome to the {serverName} Service Bot for this server");
@@ -207,7 +207,7 @@ public partial class SinusWizardModule : InteractionModuleBase
         public string Delete { get; set; }
     }
 
-    private async Task<SinusDbContext> GetDbContext()
+    private async Task<LaciDbContext> GetDbContext()
     {
         return await _dbContextFactory.CreateDbContextAsync().ConfigureAwait(false);
     }
@@ -256,16 +256,16 @@ public partial class SinusWizardModule : InteractionModuleBase
         }).ConfigureAwait(false);
     }
 
-    private async Task AddUserSelection(SinusDbContext sinusDb, ComponentBuilder cb, string customId)
+    private async Task AddUserSelection(LaciDbContext db, ComponentBuilder cb, string customId)
     {
         var discordId = Context.User.Id;
-        var existingAuth = await sinusDb.LodeStoneAuth.Include(u => u.User).SingleOrDefaultAsync(e => e.DiscordId == discordId).ConfigureAwait(false);
+        var existingAuth = await db.LodeStoneAuth.Include(u => u.User).SingleOrDefaultAsync(e => e.DiscordId == discordId).ConfigureAwait(false);
         if (existingAuth != null)
         {
             SelectMenuBuilder sb = new();
             sb.WithPlaceholder("Select a UID");
             sb.WithCustomId(customId);
-            var existingUids = await sinusDb.Auth.Include(u => u.User).Where(u => u.UserUID == existingAuth.User.UID || u.PrimaryUserUID == existingAuth.User.UID)
+            var existingUids = await db.Auth.Include(u => u.User).Where(u => u.UserUID == existingAuth.User.UID || u.PrimaryUserUID == existingAuth.User.UID)
                 .OrderByDescending(u => u.PrimaryUser == null).ToListAsync().ConfigureAwait(false);
             foreach (var entry in existingUids)
             {
@@ -278,7 +278,7 @@ public partial class SinusWizardModule : InteractionModuleBase
         }
     }
 
-    private async Task AddGroupSelection(SinusDbContext db, ComponentBuilder cb, string customId)
+    private async Task AddGroupSelection(LaciDbContext db, ComponentBuilder cb, string customId)
     {
         var primary = (await db.LodeStoneAuth.Include(u => u.User).SingleAsync(u => u.DiscordId == Context.User.Id).ConfigureAwait(false)).User;
         var secondary = await db.Auth.Include(u => u.User).Where(u => u.PrimaryUserUID == primary.UID).Select(u => u.User).ToListAsync().ConfigureAwait(false);
@@ -301,7 +301,7 @@ public partial class SinusWizardModule : InteractionModuleBase
         }
     }
 
-    private async Task<string> GenerateLodestoneAuth(ulong discordid, string hashedLodestoneId, SinusDbContext dbContext)
+    private async Task<string> GenerateLodestoneAuth(ulong discordid, string hashedLodestoneId, LaciDbContext dbContext)
     {
         var auth = StringUtils.GenerateRandomString(12, "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz");
         LodeStoneAuth lsAuth = new LodeStoneAuth()

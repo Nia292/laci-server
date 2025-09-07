@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "SinusSynchronousStaticFilesServer": {
+    "LaciSynchroni.StaticFilesServer": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

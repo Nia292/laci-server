@@ -13,14 +13,14 @@ namespace LaciSynchroni.StaticFilesServer.Services;
 public class MainFileCleanupService : IHostedService
 {
     private readonly IConfigurationService<StaticFilesServerConfiguration> _configuration;
-    private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<LaciDbContext> _dbContextFactory;
     private readonly ILogger<MainFileCleanupService> _logger;
-    private readonly SinusMetrics _metrics;
+    private readonly LaciMetrics _metrics;
     private CancellationTokenSource _cleanupCts;
 
-    public MainFileCleanupService(SinusMetrics metrics, ILogger<MainFileCleanupService> logger,
+    public MainFileCleanupService(LaciMetrics metrics, ILogger<MainFileCleanupService> logger,
         IConfigurationService<StaticFilesServerConfiguration> configuration,
-        IDbContextFactory<SinusDbContext> dbContextFactory)
+        IDbContextFactory<LaciDbContext> dbContextFactory)
     {
         _metrics = metrics;
         _logger = logger;
@@ -46,7 +46,7 @@ public class MainFileCleanupService : IHostedService
         return Task.CompletedTask;
     }
 
-    private List<FileInfo> CleanUpFilesBeyondSizeLimit(List<FileInfo> files, double sizeLimit, bool deleteFromDb, SinusDbContext dbContext, CancellationToken ct)
+    private List<FileInfo> CleanUpFilesBeyondSizeLimit(List<FileInfo> files, double sizeLimit, bool deleteFromDb, LaciDbContext dbContext, CancellationToken ct)
     {
         if (sizeLimit <= 0)
         {
@@ -103,7 +103,7 @@ public class MainFileCleanupService : IHostedService
     }
 
     private async Task<List<FileInfo>> CleanUpOutdatedFiles(string dir, List<FileInfo> allFilesInDir, int unusedRetention, int forcedDeletionAfterHours,
-        bool deleteFromDb, SinusDbContext dbContext, CancellationToken ct)
+        bool deleteFromDb, LaciDbContext dbContext, CancellationToken ct)
     {
         try
         {
@@ -139,7 +139,7 @@ public class MainFileCleanupService : IHostedService
         return [];
     }
 
-    private void CleanUpStuckUploads(SinusDbContext dbContext)
+    private void CleanUpStuckUploads(LaciDbContext dbContext)
     {
         var pastTime = DateTime.UtcNow.Subtract(TimeSpan.FromMinutes(20));
         var stuckUploads = dbContext.Files.Where(f => !f.Uploaded && f.UploadDate < pastTime);
@@ -241,7 +241,7 @@ public class MainFileCleanupService : IHostedService
         }
     }
     private async Task<List<string>> CleanupViaDb(string dir, int forcedDeletionAfterHours,
-        SinusDbContext dbContext, DateTime lastAccessCutoffTime, DateTime forcedDeletionCutoffTime, List<FileCache> allDbFiles, CancellationToken ct)
+        LaciDbContext dbContext, DateTime lastAccessCutoffTime, DateTime forcedDeletionCutoffTime, List<FileCache> allDbFiles, CancellationToken ct)
     {
         int fileCounter = 0;
         List<string> removedFileHashes = new();

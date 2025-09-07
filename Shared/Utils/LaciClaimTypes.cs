@@ -1,6 +1,6 @@
 ﻿namespace LaciSynchroni.Shared.Utils;
 
-public static class SinusClaimTypes
+public static class LaciClaimTypes
 {
     public const string Uid = "uid";
     public const string Alias = "alias";

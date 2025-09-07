@@ -9,7 +9,7 @@ public class ValidTokenRequirementHandler : AuthorizationHandler<ValidTokenRequi
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ValidTokenRequirement requirement)
     {
-        var expirationClaimValue = context.User.Claims.SingleOrDefault(r => string.Equals(r.Type, SinusClaimTypes.Expires, StringComparison.Ordinal));
+        var expirationClaimValue = context.User.Claims.SingleOrDefault(r => string.Equals(r.Type, LaciClaimTypes.Expires, StringComparison.Ordinal));
         if (expirationClaimValue == null)
         {
             context.Fail();
@@ -33,7 +33,7 @@ public class ValidTokenHubRequirementHandler : AuthorizationHandler<ValidTokenRe
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ValidTokenRequirement requirement, HubInvocationContext resource)
     {
-        var expirationClaimValue = context.User.Claims.SingleOrDefault(r => string.Equals(r.Type, SinusClaimTypes.Expires, StringComparison.Ordinal));
+        var expirationClaimValue = context.User.Claims.SingleOrDefault(r => string.Equals(r.Type, LaciClaimTypes.Expires, StringComparison.Ordinal));
         if (expirationClaimValue == null)
         {
             context.Fail();

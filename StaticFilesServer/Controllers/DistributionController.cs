@@ -19,7 +19,7 @@ public class DistributionController : ControllerBase
     [Authorize(Policy = "Internal")]
     public async Task<IActionResult> GetFile(string file)
     {
-        _logger.LogInformation($"GetFile:{SinusUser}:{file}");
+        _logger.LogInformation($"GetFile:{LaciUser}:{file}");
 
         var fs = await _cachedFileProvider.DownloadAndGetLocalFileInfo(file);
         if (fs == null) return NotFound();

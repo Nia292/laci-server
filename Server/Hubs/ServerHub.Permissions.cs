@@ -15,7 +15,7 @@ public partial class ServerHub
     [Authorize(Policy = "Authenticated")]
     public async Task UserUpdateDefaultPermissions(DefaultPermissionsDto defaultPermissions)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(defaultPermissions));
+        _logger.LogCallInfo(ServerHubLogger.Args(defaultPermissions));
 
         var permissions = await DbContext.UserDefaultPreferredPermissions.SingleAsync(u => u.UserUID == UserUID).ConfigureAwait(false);
 
@@ -36,7 +36,7 @@ public partial class ServerHub
     [Authorize(Policy = "Identified")]
     public async Task SetBulkPermissions(BulkPermissionsDto dto)
     {
-        _logger.LogCallInfo(SinusHubLogger.Args(
+        _logger.LogCallInfo(ServerHubLogger.Args(
             "Individual", string.Join(';', dto.AffectedUsers.Select(g => g.Key + ":" + g.Value)),
             "Group", string.Join(';', dto.AffectedGroups.Select(g => g.Key + ":" + g.Value))));
 

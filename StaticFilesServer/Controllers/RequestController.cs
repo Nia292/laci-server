@@ -22,7 +22,7 @@ public class RequestController : ControllerBase
     {
         try
         {
-            _requestQueue.RemoveFromQueue(requestId, SinusUser, IsPriority);
+            _requestQueue.RemoveFromQueue(requestId, LaciUser, IsPriority);
             return Ok();
         }
         catch (OperationCanceledException) { return BadRequest(); }
@@ -41,7 +41,7 @@ public class RequestController : ControllerBase
             }
 
             Guid g = Guid.NewGuid();
-            await _requestQueue.EnqueueUser(new(g, SinusUser, files.ToList()), IsPriority, HttpContext.RequestAborted);
+            await _requestQueue.EnqueueUser(new(g, LaciUser, files.ToList()), IsPriority, HttpContext.RequestAborted);
 
             return Ok(g);
         }
@@ -54,8 +54,8 @@ public class RequestController : ControllerBase
     {
         try
         {
-            if (!_requestQueue.StillEnqueued(requestId, SinusUser, IsPriority))
-                await _requestQueue.EnqueueUser(new(requestId, SinusUser, files.ToList()), IsPriority, HttpContext.RequestAborted);
+            if (!_requestQueue.StillEnqueued(requestId, LaciUser, IsPriority))
+                await _requestQueue.EnqueueUser(new(requestId, LaciUser, files.ToList()), IsPriority, HttpContext.RequestAborted);
             return Ok();
         }
         catch (OperationCanceledException) { return BadRequest(); }
