@@ -1,4 +1,4 @@
-name: Build Sinus Services
+name: Build Laci Services
 
 on:
   push:
@@ -19,14 +19,14 @@ jobs:
     strategy:
       matrix:
         service:
-          - name: authservice
-            dockerfile: Docker/build/Dockerfile-SinusSynchronousAuthService
           - name: server
-            dockerfile: Docker/build/Dockerfile-SinusSynchronousServer
-          - name: services
-            dockerfile: Docker/build/Dockerfile-SinusSynchronousServices
+            dockerfile: Docker/build/Dockerfile.server
+          - name: authservice
+            dockerfile: Docker/build/Dockerfile.authservice
           - name: staticfilesserver
-            dockerfile: Docker/build/Dockerfile-SinusSynchronousStaticFilesServer
+            dockerfile: Docker/build/Dockerfile.staticfilesserver
+          - name: services
+            dockerfile: Docker/build/Dockerfile.services
 
     permissions:
       contents: read
@@ -38,7 +38,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
-          # Load the SinusAPI git submodule
+          # Load submodules
           submodules: 'recursive'
       
       - name: Set up Docker Buildx
