@@ -1,0 +1,31 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+
+RUN git clone --recurse-submodules https://github.com/LaciSynchroni/server
+
+WORKDIR /server/StaticFilesServer/
+
+RUN dotnet publish \
+        --configuration=Release \
+        --os=linux \
+        --output=/build \
+        LaciSynchroni.StaticFilesServer.csproj
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
+
+RUN adduser \
+        --disabled-password \
+        --group \
+        --no-create-home \
+        --quiet \
+        --system \
+        laci
+
+COPY --from=build /build /opt/LaciSynchroniStaticFilesServer
+RUN chown -R laci:laci /opt/LaciSynchroniStaticFilesServer && \
+    apt-get update && apt-get install curl -y && \
+    rm -rf /var/lib/apt/lists/*
+
+USER laci:laci
+WORKDIR /opt/LaciSynchroniStaticFilesServer
+
+CMD ["./LaciSynchroniStaticFilesServer"]

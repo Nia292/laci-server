@@ -33,7 +33,7 @@ if (-not $All -and -not $others) {
 }
 
 if ($Git) {
-  $Suffix = "-git"
+  $Suffix = ".git"
 } else {
   $Suffix = ""
 }
@@ -41,10 +41,10 @@ if ($Git) {
 git submodule update --init --remote --recursive
 
 $MappedServices = @{
-  'AuthService'      = "sinus-synchronous-authservice"
-  'Server'           = "sinus-synchronous-server"
-  'Services'         = "sinus-synchronous-services"
-  'StaticFilesServer' = "sinus-synchronous-staticfilesserver"
+  'authservice'      = "authservice"
+  'server'           = "server"
+  'services'         = "services"
+  'staticfilesserver' = "staticfilesserver"
 }
 
 function Build-Service {
@@ -56,16 +56,16 @@ function Build-Service {
     [ValidateNotNullOrEmpty()]
     [string]$Tag
   )
-  $DockerTag = "syrilai/$($Tag):latest"
+  $DockerTag = "lacisynchroni/$($Tag):latest"
   
   if ($Local) {
     Push-Location "..\.."
-    $Dockerfile = ".\Docker\build\Dockerfile-SinusSynchronous$Name$Suffix"
+    $Dockerfile = ".\Docker\build\Dockerfile.$Name$Suffix"
   } else {
-    $Dockerfile = ".\Dockerfile-SinusSynchronous$Name$Suffix"
+    $Dockerfile = ".\Dockerfile.$Name$Suffix"
   }
 
-  Write-Host "🔨 Building '$DockerTag' from '$Dockerfile'..."
+  Write-Host "Building '$DockerTag' from '$Dockerfile'..."
   $DockerArgs = @(
     "build",
     "-t", $DockerTag
@@ -81,6 +81,8 @@ function Build-Service {
   if ($Local) {
     Push-Location ".\Docker\build"
   }
+
+  Write-Host "Finished '$DockerTag'."
 }
 
 if ($All) {
@@ -88,8 +90,8 @@ if ($All) {
     Build-Service -Name $entry.Key -Tag $entry.Value
   }
 } else {
-  if ($AuthService)      { Build-Service -Name "AuthService"      -Tag $MappedServices['AuthService'] }
-  if ($Server)           { Build-Service -Name "Server"           -Tag $MappedServices['Server'] }
-  if ($Services)         { Build-Service -Name "Services"         -Tag $MappedServices['Services'] }
-  if ($StaticFilesServer) { Build-Service -Name "StaticFilesServer" -Tag $MappedServices['StaticFilesServer'] }
+  if ($AuthService)      { Build-Service -Name "authservice"      -Tag $MappedServices['authservice'] }
+  if ($Server)           { Build-Service -Name "server"           -Tag $MappedServices['server'] }
+  if ($Services)         { Build-Service -Name "services"         -Tag $MappedServices['services'] }
+  if ($StaticFilesServer) { Build-Service -Name "staticfilesserver" -Tag $MappedServices['staticfilesserver'] }
 }

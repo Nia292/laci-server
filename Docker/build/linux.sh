@@ -45,7 +45,7 @@ if ! $ALL && ! $AUTH_SERVICE && ! $SERVER && ! $SERVICES && ! $STATIC_FILES_SERV
 fi
 
 if $GIT; then
-  SUFFIX="-git"
+  SUFFIX=".git"
 else
   SUFFIX=""
 fi
@@ -54,10 +54,10 @@ git submodule update --init --remote --recursive
 
 # Associative array for service mappings
 declare -A MAPPED_SERVICES=(
-  ["AuthService"]="sinus-synchronous-authservice"
-  ["Server"]="sinus-synchronous-server"
-  ["Services"]="sinus-synchronous-services"
-  ["StaticFilesServer"]="sinus-synchronous-staticfilesserver"
+  ["authservice"]="authservice"
+  ["server"]="server"
+  ["services"]="services"
+  ["staticfilesserver"]="staticfilesserver"
 )
 
 build_service() {
@@ -69,17 +69,17 @@ build_service() {
     return 1
   fi
   
-  local docker_tag="syrilai/$tag:latest"
+  local docker_tag="lacisynchroni/$tag:latest"
   local original_dir=$(pwd)
   
   if $LOCAL; then
     cd "../.."
-    dockerfile="./Docker/build/Dockerfile-SinusSynchronous$name$SUFFIX"
+    dockerfile="./Docker/build/Dockerfile.$name$SUFFIX"
   else
-    dockerfile="./Dockerfile-SinusSynchronous$name$SUFFIX"
+    dockerfile="./Dockerfile.$name$SUFFIX"
   fi
   
-  echo "🔨 Building '$docker_tag' from '$dockerfile'..."
+  echo "Building '$docker_tag' from '$dockerfile'..."
   
   docker build \
     -t "$docker_tag" \
@@ -92,6 +92,8 @@ build_service() {
   if $LOCAL; then
     cd "$original_dir"
   fi
+
+  echo "Finished '$docker_tag'."
 }
 
 if $ALL; then
@@ -100,15 +102,15 @@ if $ALL; then
   done
 else
   if $AUTH_SERVICE; then
-    build_service "AuthService" "${MAPPED_SERVICES[AuthService]}"
+    build_service "authservice" "${MAPPED_SERVICES[authservice]}"
   fi
   if $SERVER; then
-    build_service "Server" "${MAPPED_SERVICES[Server]}"
+    build_service "server" "${MAPPED_SERVICES[server]}"
   fi
   if $SERVICES; then
-    build_service "Services" "${MAPPED_SERVICES[Services]}"
+    build_service "services" "${MAPPED_SERVICES[services]}"
   fi
   if $STATIC_FILES_SERVER; then
-    build_service "StaticFilesServer" "${MAPPED_SERVICES[StaticFilesServer]}"
+    build_service "staticfilesserver" "${MAPPED_SERVICES[staticfilesserver]}"
   fi
 fi
