@@ -75,7 +75,7 @@ public class Startup
                     typeof(LaciServerConfigurationController),
                     typeof(LaciBaseConfigurationController),
                     typeof(ClientMessageController),
-                    typeof(ConfigurationController)
+                    typeof(ClientConfigurationController)
                     ));
             }
             else

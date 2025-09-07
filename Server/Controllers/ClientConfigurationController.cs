@@ -8,9 +8,9 @@ using System.Reflection;
 namespace LaciSynchroni.Server.Controllers;
 
 [ApiController]
-[Route("/configuration")]
+[Route("/clientconfiguration")]
 [AllowAnonymous]
-public class ConfigurationController(
+public class ClientConfigurationController(
     IConfigurationService<ServerConfiguration> serverConfig) : ControllerBase
 {
     [Route("get")]
@@ -18,7 +18,7 @@ public class ConfigurationController(
     {
         var configuration = new ConfigurationDto()
         {
-            ServerName = serverConfig.GetValueOrDefault(nameof(ServerConfiguration.ServerName), "Unnamed Server"),
+            ServerName = serverConfig.GetValueOrDefault(nameof(ServerConfiguration.ServerName), "Laci Synchroni"),
             ServerVersion = Assembly.GetExecutingAssembly().GetName().Version,
             ServerUri = serverConfig.GetValueOrDefault(nameof(ServerConfiguration.ServerPublicUri), new Uri("wss://noemptyuri")),
             DiscordInvite = serverConfig.GetValueOrDefault<string>(nameof(ServerConfiguration.DiscordInvite), defaultValue: null),
