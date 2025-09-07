@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace SinusSynchronousShared.Utils.Configuration;
+namespace LaciSynchroni.Shared.Utils.Configuration;
 
 public class SinusConfigurationBase : ISinusConfiguration
 {

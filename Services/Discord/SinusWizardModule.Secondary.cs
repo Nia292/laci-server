@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 
-namespace SinusSynchronousServices.Discord;
+namespace LaciSynchroni.Services.Discord;
 
 public partial class SinusWizardModule
 {

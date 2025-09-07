@@ -1,25 +1,25 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using SinusSynchronous.API.Data;
-using SinusSynchronous.API.Data.Enum;
-using SinusSynchronous.API.Dto;
-using SinusSynchronous.API.SignalR;
-using SinusSynchronousServer.Services;
-using SinusSynchronousServer.Utils;
-using SinusSynchronousShared;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Common.Data;
+using LaciSynchroni.Common.Data.Enum;
+using LaciSynchroni.Common.Dto;
+using LaciSynchroni.Common.SignalR;
+using LaciSynchroni.Server.Services;
+using LaciSynchroni.Server.Utils;
+using LaciSynchroni.Shared;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System.Collections.Concurrent;
 
-namespace SinusSynchronousServer.Hubs;
+namespace LaciSynchroni.Server.Hubs;
 
 [Authorize(Policy = "Authenticated")]
-public partial class SinusHub : Hub<ISinusHub>, ISinusHub
+public partial class ServerHub : Hub<IServerHub>, IServerHub
 {
     private static readonly ConcurrentDictionary<string, string> _userConnections = new(StringComparer.Ordinal);
     private readonly SinusMetrics _sinusMetrics;
@@ -42,8 +42,8 @@ public partial class SinusHub : Hub<ISinusHub>, ISinusHub
     private readonly int _maxCharaDataByUser;
     private readonly int _maxCharaDataByUserVanity;
 
-    public SinusHub(SinusMetrics sinusMetrics,
-        IDbContextFactory<SinusDbContext> sinusDbContextFactory, ILogger<SinusHub> logger, SystemInfoService systemInfoService,
+    public ServerHub(SinusMetrics sinusMetrics,
+        IDbContextFactory<SinusDbContext> sinusDbContextFactory, ILogger<ServerHub> logger, SystemInfoService systemInfoService,
         IConfigurationService<ServerConfiguration> configuration, IHttpContextAccessor contextAccessor,
         IRedisDatabase redisDb, OnlineSyncedPairCacheService onlineSyncedPairCacheService, SinusCensus sinusCensus,
         GPoseLobbyDistributionService gPoseLobbyDistributionService)
@@ -108,7 +108,7 @@ public partial class SinusHub : Hub<ISinusHub>, ISinusHub
         return new ConnectionDto(new UserData(dbUser.UID, string.IsNullOrWhiteSpace(dbUser.Alias) ? null : dbUser.Alias))
         {
             CurrentClientVersion = _expectedClientVersion,
-            ServerVersion = ISinusHub.ApiVersion,
+            ServerVersion = IServerHub.ApiVersion,
             IsAdmin = dbUser.IsAdmin,
             IsModerator = dbUser.IsModerator,
             ServerInfo = new ServerInfo()

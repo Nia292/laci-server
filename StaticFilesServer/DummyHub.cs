@@ -8,8 +8,8 @@
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 #pragma warning disable MA0048 // File name must match type name
-namespace SinusSynchronousServer.Hubs;
-public class SinusHub : Hub
+namespace LaciSynchroni.Server.Hubs;
+public class ServerHub : Hub
 {
     public override Task OnConnectedAsync()
     {

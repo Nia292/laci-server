@@ -1,10 +1,10 @@
-﻿using SinusSynchronousAuthService.Authentication;
-using SinusSynchronousAuthService.Services;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.AuthService.Authentication;
+using LaciSynchroni.AuthService.Services;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,7 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace SinusSynchronousAuthService.Controllers;
+namespace LaciSynchroni.AuthService.Controllers;
 
 public abstract class AuthControllerBase : Controller
 {

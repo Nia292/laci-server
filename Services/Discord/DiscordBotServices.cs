@@ -3,13 +3,13 @@ using Discord;
 using Discord.Net;
 using Discord.Rest;
 using Discord.WebSocket;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 using StackExchange.Redis;
 
-namespace SinusSynchronousServices.Discord;
+namespace LaciSynchroni.Services.Discord;
 
 public class DiscordBotServices
 {

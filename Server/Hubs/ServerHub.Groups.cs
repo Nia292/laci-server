@@ -1,17 +1,17 @@
-﻿using SinusSynchronous.API.Data.Enum;
-using SinusSynchronous.API.Data.Extensions;
-using SinusSynchronous.API.Dto.Group;
-using SinusSynchronousServer.Utils;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Utils;
+﻿using LaciSynchroni.Common.Data.Enum;
+using LaciSynchroni.Common.Data.Extensions;
+using LaciSynchroni.Common.Dto.Group;
+using LaciSynchroni.Server.Utils;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 
-namespace SinusSynchronousServer.Hubs;
+namespace LaciSynchroni.Server.Hubs;
 
-public partial class SinusHub
+public partial class ServerHub
 {
     [Authorize(Policy = "Identified")]
     public async Task GroupBanUser(GroupPairDto dto, string reason)

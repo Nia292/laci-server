@@ -1,14 +1,14 @@
 ﻿using ByteSizeLib;
 using K4os.Compression.LZ4.Legacy;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
-using SinusSynchronousStaticFilesServer.Utils;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
+using LaciSynchroni.StaticFilesServer.Utils;
 using Microsoft.EntityFrameworkCore;
 
-namespace SinusSynchronousStaticFilesServer.Services;
+namespace LaciSynchroni.StaticFilesServer.Services;
 
 public class MainFileCleanupService : IHostedService
 {

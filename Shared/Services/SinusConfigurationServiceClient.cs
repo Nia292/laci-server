@@ -1,5 +1,5 @@
-﻿using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,7 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 
-namespace SinusSynchronousShared.Services;
+namespace LaciSynchroni.Shared.Services;
 
 public class SinusConfigurationServiceClient<T> : IHostedService, IConfigurationService<T> where T : class, ISinusConfiguration
 {

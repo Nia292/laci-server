@@ -1,15 +1,15 @@
 ﻿using K4os.Compression.LZ4.Legacy;
-using SinusSynchronous.API.Dto.Files;
-using SinusSynchronous.API.Routes;
-using SinusSynchronous.API.SignalR;
-using SinusSynchronousServer.Hubs;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
-using SinusSynchronousStaticFilesServer.Services;
-using SinusSynchronousStaticFilesServer.Utils;
+using LaciSynchroni.Common.Dto.Files;
+using LaciSynchroni.Common.Routes;
+using LaciSynchroni.Common.SignalR;
+using LaciSynchroni.Server.Hubs;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
+using LaciSynchroni.StaticFilesServer.Services;
+using LaciSynchroni.StaticFilesServer.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +18,9 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace SinusSynchronousStaticFilesServer.Controllers;
+namespace LaciSynchroni.StaticFilesServer.Controllers;
 
-[Route(SinusFiles.ServerFiles)]
+[Route(FilesRoutes.ServerFiles)]
 public class ServerFilesController : ControllerBase
 {
     private static readonly SemaphoreSlim _fileLockDictLock = new(1);
@@ -28,14 +28,14 @@ public class ServerFilesController : ControllerBase
     private readonly string _basePath;
     private readonly CachedFileProvider _cachedFileProvider;
     private readonly IConfigurationService<StaticFilesServerConfiguration> _configuration;
-    private readonly IHubContext<SinusHub> _hubContext;
+    private readonly IHubContext<ServerHub> _hubContext;
     private readonly IDbContextFactory<SinusDbContext> _sinusDbContext;
     private readonly SinusMetrics _metricsClient;
     private readonly MainServerShardRegistrationService _shardRegistrationService;
 
     public ServerFilesController(ILogger<ServerFilesController> logger, CachedFileProvider cachedFileProvider,
         IConfigurationService<StaticFilesServerConfiguration> configuration,
-        IHubContext<SinusHub> hubContext,
+        IHubContext<ServerHub> hubContext,
         IDbContextFactory<SinusDbContext> sinusDbContext, SinusMetrics metricsClient,
         MainServerShardRegistrationService shardRegistrationService) : base(logger)
     {
@@ -50,7 +50,7 @@ public class ServerFilesController : ControllerBase
         _shardRegistrationService = shardRegistrationService;
     }
 
-    [HttpPost(SinusFiles.ServerFiles_DeleteAll)]
+    [HttpPost(FilesRoutes.ServerFiles_DeleteAll)]
     public async Task<IActionResult> FilesDeleteAll()
     {
         using var dbContext = await _sinusDbContext.CreateDbContextAsync();
@@ -75,7 +75,7 @@ public class ServerFilesController : ControllerBase
         return Ok();
     }
 
-    [HttpGet(SinusFiles.ServerFiles_GetSizes)]
+    [HttpGet(FilesRoutes.ServerFiles_GetSizes)]
     public async Task<IActionResult> FilesGetSizes([FromBody] List<string> hashes)
     {
         using var dbContext = await _sinusDbContext.CreateDbContextAsync();
@@ -120,14 +120,14 @@ public class ServerFilesController : ControllerBase
         return Ok(JsonSerializer.Serialize(response));
     }
 
-    [HttpGet(SinusFiles.ServerFiles_DownloadServers)]
+    [HttpGet(FilesRoutes.ServerFiles_DownloadServers)]
     public async Task<IActionResult> GetDownloadServers()
     {
         var allFileShards = _shardRegistrationService.GetConfigurationsByContinent(Continent);
         return Ok(JsonSerializer.Serialize(allFileShards.SelectMany(t => t.RegionUris.Select(v => v.Value.ToString()))));
     }
 
-    [HttpPost(SinusFiles.ServerFiles_FilesSend)]
+    [HttpPost(FilesRoutes.ServerFiles_FilesSend)]
     public async Task<IActionResult> FilesSend([FromBody] FilesSendDto filesSendDto)
     {
         using var dbContext = await _sinusDbContext.CreateDbContextAsync();
@@ -164,14 +164,14 @@ public class ServerFilesController : ControllerBase
 
         if (notCoveredFiles.Any(p => !p.Value.IsForbidden))
         {
-            await _hubContext.Clients.Users(filesSendDto.UIDs).SendAsync(nameof(ISinusHub.Client_UserReceiveUploadStatus), new SinusSynchronous.API.Dto.User.UserDto(new(SinusUser)))
+            await _hubContext.Clients.Users(filesSendDto.UIDs).SendAsync(nameof(IServerHub.Client_UserReceiveUploadStatus), new Common.Dto.User.UserDto(new(SinusUser)))
                 .ConfigureAwait(false);
         }
 
         return Ok(JsonSerializer.Serialize(notCoveredFiles.Values.ToList()));
     }
 
-    [HttpPost(SinusFiles.ServerFiles_Upload + "/{hash}")]
+    [HttpPost(FilesRoutes.ServerFiles_Upload + "/{hash}")]
     [RequestSizeLimit(200 * 1024 * 1024)]
     public async Task<IActionResult> UploadFile(string hash, CancellationToken requestAborted)
     {
@@ -226,7 +226,7 @@ public class ServerFilesController : ControllerBase
         }
     }
 
-    [HttpPost(SinusFiles.ServerFiles_UploadMunged + "/{hash}")]
+    [HttpPost(FilesRoutes.ServerFiles_UploadMunged + "/{hash}")]
     [RequestSizeLimit(200 * 1024 * 1024)]
     public async Task<IActionResult> UploadFileMunged(string hash, CancellationToken requestAborted)
     {

@@ -1,7 +1,7 @@
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 
-namespace SinusSynchronousAuthService;
+namespace LaciSynchroni.AuthService;
 
 public class Program
 {

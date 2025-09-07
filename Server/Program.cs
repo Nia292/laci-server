@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 
-namespace SinusSynchronousServer;
+namespace LaciSynchroni.Server;
 
 public class Program
 {

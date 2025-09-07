@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace SinusSynchronousShared.RequirementHandlers;
+namespace LaciSynchroni.Shared.RequirementHandlers;
 
 public class ValidTokenRequirement : IAuthorizationRequirement { }

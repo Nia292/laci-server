@@ -1,10 +1,10 @@
-﻿using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace SinusSynchronousShared.Services;
+namespace LaciSynchroni.Shared.Services;
 
 [Route("configuration/[controller]")]
 [Authorize(Policy = "Internal")]

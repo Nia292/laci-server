@@ -1,15 +1,15 @@
-﻿using SinusSynchronous.API.Dto;
-using SinusSynchronous.API.SignalR;
-using SinusSynchronousServer.Hubs;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Common.Dto;
+using LaciSynchroni.Common.SignalR;
+using LaciSynchroni.Server.Hubs;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 
-namespace SinusSynchronousServer.Services;
+namespace LaciSynchroni.Server.Services;
 
 public sealed class SystemInfoService : BackgroundService
 {
@@ -17,12 +17,12 @@ public sealed class SystemInfoService : BackgroundService
     private readonly IConfigurationService<ServerConfiguration> _config;
     private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;
     private readonly ILogger<SystemInfoService> _logger;
-    private readonly IHubContext<SinusHub, ISinusHub> _hubContext;
+    private readonly IHubContext<ServerHub, IServerHub> _hubContext;
     private readonly IRedisDatabase _redis;
     public SystemInfoDto SystemInfoDto { get; private set; } = new();
 
     public SystemInfoService(SinusMetrics sinusMetrics, IConfigurationService<ServerConfiguration> configurationService, IDbContextFactory<SinusDbContext> dbContextFactory,
-        ILogger<SystemInfoService> logger, IHubContext<SinusHub, ISinusHub> hubContext, IRedisDatabase redisDb)
+        ILogger<SystemInfoService> logger, IHubContext<ServerHub, IServerHub> hubContext, IRedisDatabase redisDb)
     {
         _sinusMetrics = sinusMetrics;
         _config = configurationService;

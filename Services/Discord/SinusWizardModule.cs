@@ -2,15 +2,15 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using StackExchange.Redis;
 using System.Text.RegularExpressions;
 
-namespace SinusSynchronousServices.Discord;
+namespace LaciSynchroni.Services.Discord;
 
 public partial class SinusWizardModule : InteractionModuleBase
 {

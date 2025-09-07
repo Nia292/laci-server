@@ -1,10 +1,10 @@
 ﻿using AspNetCoreRateLimit;
-using SinusSynchronousShared;
-using SinusSynchronousShared.Utils;
+using LaciSynchroni.Shared;
+using LaciSynchroni.Shared.Utils;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
-namespace SinusSynchronousServer.Hubs;
+namespace LaciSynchroni.Server.Hubs;
 public class SignalRLimitFilter : IHubFilter
 {
     private readonly IRateLimitProcessor _processor;

@@ -1,4 +1,4 @@
-﻿using SinusSynchronous.API.Data.Enum;
+﻿using LaciSynchroni.Common.Data.Enum;
 
-namespace SinusSynchronousShared.Utils;
+namespace LaciSynchroni.Shared.Utils;
 public record ClientMessage(MessageSeverity Severity, string Message, string UID);

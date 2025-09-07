@@ -1,7 +1,7 @@
-﻿using SinusSynchronousShared.Data;
+﻿using LaciSynchroni.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace SinusSynchronousServer.Services;
+namespace LaciSynchroni.Server.Services;
 
 public class CharaDataCleanupService : BackgroundService
 {

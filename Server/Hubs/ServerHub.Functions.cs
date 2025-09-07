@@ -1,15 +1,15 @@
-﻿using SinusSynchronousShared.Models;
+﻿using LaciSynchroni.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using SinusSynchronousServer.Utils;
-using SinusSynchronousShared.Utils;
-using SinusSynchronous.API.Data;
-using SinusSynchronous.API.Dto.Group;
-using SinusSynchronousShared.Metrics;
+using LaciSynchroni.Server.Utils;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Common.Data;
+using LaciSynchroni.Common.Dto.Group;
+using LaciSynchroni.Shared.Metrics;
 using Microsoft.AspNetCore.SignalR;
 
-namespace SinusSynchronousServer.Hubs;
+namespace LaciSynchroni.Server.Hubs;
 
-public partial class SinusHub
+public partial class ServerHub
 {
     public string UserCharaIdent => Context.User?.Claims?.SingleOrDefault(c => string.Equals(c.Type, SinusClaimTypes.CharaIdent, StringComparison.Ordinal))?.Value ?? throw new Exception("No Chara Ident in Claims");
 

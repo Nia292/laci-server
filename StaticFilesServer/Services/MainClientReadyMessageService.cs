@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SinusSynchronous.API.SignalR;
-using SinusSynchronousServer.Hubs;
+using LaciSynchroni.Common.SignalR;
+using LaciSynchroni.Server.Hubs;
 
-namespace SinusSynchronousStaticFilesServer.Services;
+namespace LaciSynchroni.StaticFilesServer.Services;
 
 public class MainClientReadyMessageService : IClientReadyMessageService
 {
     private readonly ILogger<MainClientReadyMessageService> _logger;
-    private readonly IHubContext<SinusHub> _sinusHub;
+    private readonly IHubContext<ServerHub> _sinusHub;
 
-    public MainClientReadyMessageService(ILogger<MainClientReadyMessageService> logger, IHubContext<SinusHub> sinusHub)
+    public MainClientReadyMessageService(ILogger<MainClientReadyMessageService> logger, IHubContext<ServerHub> sinusHub)
     {
         _logger = logger;
         _sinusHub = sinusHub;
@@ -18,6 +18,6 @@ public class MainClientReadyMessageService : IClientReadyMessageService
     public async Task SendDownloadReady(string uid, Guid requestId)
     {
         _logger.LogInformation("Sending Client Ready for {uid}:{requestId} to SignalR", uid, requestId);
-        await _sinusHub.Clients.User(uid).SendAsync(nameof(ISinusHub.Client_DownloadReady), requestId).ConfigureAwait(false);
+        await _sinusHub.Clients.User(uid).SendAsync(nameof(IServerHub.Client_DownloadReady), requestId).ConfigureAwait(false);
     }
 }

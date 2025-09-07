@@ -1,6 +1,6 @@
-﻿namespace SinusSynchronousServer.Hubs;
+﻿namespace LaciSynchroni.Server.Hubs;
 
-public partial class SinusHub
+public partial class ServerHub
 {
     private record UserPair
     {

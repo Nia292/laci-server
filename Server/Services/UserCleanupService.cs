@@ -1,12 +1,12 @@
-﻿using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.EntityFrameworkCore;
 
-namespace SinusSynchronousServer.Services;
+namespace LaciSynchroni.Server.Services;
 
 public class UserCleanupService : IHostedService
 {

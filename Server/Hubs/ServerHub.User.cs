@@ -1,22 +1,22 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using SinusSynchronous.API.Data;
-using SinusSynchronous.API.Data.Enum;
-using SinusSynchronous.API.Data.Extensions;
-using SinusSynchronous.API.Dto.User;
-using SinusSynchronousServer.Utils;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Models;
+using LaciSynchroni.Common.Data;
+using LaciSynchroni.Common.Data.Enum;
+using LaciSynchroni.Common.Data.Extensions;
+using LaciSynchroni.Common.Dto.User;
+using LaciSynchroni.Server.Utils;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
-namespace SinusSynchronousServer.Hubs;
+namespace LaciSynchroni.Server.Hubs;
 
-public partial class SinusHub
+public partial class ServerHub
 {
     private static readonly string[] AllowedExtensionsForGamePaths = { ".mdl", ".tex", ".mtrl", ".tmb", ".pap", ".avfx", ".atex", ".sklb", ".eid", ".phyb", ".pbd", ".scd", ".skp", ".shpk" };
 

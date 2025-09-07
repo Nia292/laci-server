@@ -1,14 +1,14 @@
-using SinusSynchronousServices.Discord;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
+using LaciSynchroni.Services.Discord;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Services;
 using StackExchange.Redis;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Utils.Configuration;
 
-namespace SinusSynchronousServices;
+namespace LaciSynchroni.Services;
 
 public class Startup
 {

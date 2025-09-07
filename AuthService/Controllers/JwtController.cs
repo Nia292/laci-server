@@ -1,18 +1,18 @@
-﻿using SinusSynchronous.API.Routes;
-using SinusSynchronousAuthService.Services;
-using SinusSynchronousShared;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Common.Routes;
+using LaciSynchroni.AuthService.Services;
+using LaciSynchroni.Shared;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
-namespace SinusSynchronousAuthService.Controllers;
+namespace LaciSynchroni.AuthService.Controllers;
 
-[Route(SinusAuth.Auth)]
+[Route(AuthRoutes.Auth)]
 public class JwtController : AuthControllerBase
 {
     public JwtController(ILogger<JwtController> logger,
@@ -26,7 +26,7 @@ public class JwtController : AuthControllerBase
     }
 
     [AllowAnonymous]
-    [HttpPost(SinusAuth.Auth_CreateIdent)]
+    [HttpPost(AuthRoutes.Auth_CreateIdent)]
     public async Task<IActionResult> CreateToken(string auth, string charaIdent)
     {
         using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();
@@ -34,7 +34,7 @@ public class JwtController : AuthControllerBase
     }
 
     [Authorize(Policy = "Authenticated")]
-    [HttpGet(SinusAuth.Auth_RenewToken)]
+    [HttpGet(AuthRoutes.Auth_RenewToken)]
     public async Task<IActionResult> RenewToken()
     {
         using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();

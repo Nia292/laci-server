@@ -1,10 +1,10 @@
-﻿using SinusSynchronous.API.Dto.User;
+﻿using LaciSynchroni.Common.Dto.User;
 using Microsoft.VisualBasic.FileIO;
 using Prometheus;
 using System.Collections.Concurrent;
 using System.Globalization;
 
-namespace SinusSynchronousServer.Services;
+namespace LaciSynchroni.Server.Services;
 
 public class SinusCensus : IHostedService
 {

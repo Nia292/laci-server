@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace SinusSynchronousServer.Migrations
+namespace LaciSynchroni.Shared.Migrations
 {
     /// <inheritdoc />
     public partial class CharaDataFileSwap : Migration

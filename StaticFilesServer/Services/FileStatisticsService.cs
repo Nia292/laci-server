@@ -1,7 +1,7 @@
-﻿using SinusSynchronousShared.Metrics;
+﻿using LaciSynchroni.Shared.Metrics;
 using System.Collections.Concurrent;
 
-namespace SinusSynchronousStaticFilesServer.Services;
+namespace LaciSynchroni.StaticFilesServer.Services;
 
 public class FileStatisticsService : IHostedService
 {

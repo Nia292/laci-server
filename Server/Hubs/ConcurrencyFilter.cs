@@ -1,10 +1,10 @@
-﻿using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.RateLimiting;
 
-namespace SinusSynchronousServer.Hubs;
+namespace LaciSynchroni.Server.Hubs;
 
 public sealed class ConcurrencyFilter : IHubFilter, IDisposable
 {
@@ -65,7 +65,7 @@ public sealed class ConcurrencyFilter : IHubFilter, IDisposable
     public async ValueTask<object> InvokeMethodAsync(
     HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object>> next)
     {
-        if (string.Equals(invocationContext.HubMethodName, nameof(SinusHub.CheckClientHealth), StringComparison.Ordinal))
+        if (string.Equals(invocationContext.HubMethodName, nameof(ServerHub.CheckClientHealth), StringComparison.Ordinal))
         {
             return await next(invocationContext).ConfigureAwait(false);
         }

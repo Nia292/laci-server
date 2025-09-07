@@ -1,13 +1,13 @@
-﻿using SinusSynchronous.API.Routes;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Common.Routes;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace SinusSynchronousStaticFilesServer.Controllers;
+namespace LaciSynchroni.StaticFilesServer.Controllers;
 
-[Route(SinusFiles.Speedtest)]
+[Route(FilesRoutes.Speedtest)]
 public class SpeedTestController : ControllerBase
 {
     private readonly IMemoryCache _memoryCache;
@@ -22,7 +22,7 @@ public class SpeedTestController : ControllerBase
         _configurationService = configurationService;
     }
 
-    [HttpGet(SinusFiles.Speedtest_Run)]
+    [HttpGet(FilesRoutes.Speedtest_Run)]
     public async Task<IActionResult> DownloadTest(CancellationToken cancellationToken)
     {
         var user = HttpContext.User.Claims.First(f => string.Equals(f.Type, SinusClaimTypes.Uid, StringComparison.Ordinal)).Value;

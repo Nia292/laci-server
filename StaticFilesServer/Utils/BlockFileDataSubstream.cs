@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace SinusSynchronousStaticFilesServer.Utils;
+namespace LaciSynchroni.StaticFilesServer.Utils;
 
 public sealed class BlockFileDataSubstream : IDisposable
 {

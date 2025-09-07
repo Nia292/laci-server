@@ -1,10 +1,10 @@
-﻿using SinusSynchronousShared.Models;
+﻿using LaciSynchroni.Shared.Models;
 using Microsoft.EntityFrameworkCore.Migrations;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 #nullable disable
 
-namespace SinusSynchronousServer.Migrations
+namespace LaciSynchroni.Shared.Migrations
 {
     /// <inheritdoc />
     public partial class permissions : Migration

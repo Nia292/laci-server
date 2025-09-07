@@ -1,5 +1,5 @@
 ﻿
-namespace SinusSynchronousStaticFilesServer.Utils;
+namespace LaciSynchroni.StaticFilesServer.Utils;
 
 public sealed class BlockFileDataStream : Stream
 {

@@ -1,4 +1,4 @@
-﻿namespace SinusSynchronousStaticFilesServer.Utils;
+﻿namespace LaciSynchroni.StaticFilesServer.Utils;
 
 public static partial class FilePathUtil
 {

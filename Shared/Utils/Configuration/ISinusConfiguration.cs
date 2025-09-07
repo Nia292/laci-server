@@ -1,4 +1,4 @@
-﻿namespace SinusSynchronousShared.Utils.Configuration;
+﻿namespace LaciSynchroni.Shared.Utils.Configuration;
 
 public interface ISinusConfiguration
 {

@@ -1,9 +1,9 @@
-﻿using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Models;
+﻿using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace SinusSynchronousShared.Utils;
+namespace LaciSynchroni.Shared.Utils;
 
 public static class SharedDbFunctions
 {

@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace SinusSynchronousServer.Migrations
+namespace LaciSynchroni.Shared.Migrations
 {
     public partial class AdjustAliasLength : Migration
     {

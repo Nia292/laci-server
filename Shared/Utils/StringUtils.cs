@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace SinusSynchronousShared.Utils;
+namespace LaciSynchroni.Shared.Utils;
 
 public static class StringUtils
 {

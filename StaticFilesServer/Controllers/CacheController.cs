@@ -1,11 +1,11 @@
-﻿using SinusSynchronous.API.Routes;
-using SinusSynchronousStaticFilesServer.Services;
-using SinusSynchronousStaticFilesServer.Utils;
+﻿using LaciSynchroni.Common.Routes;
+using LaciSynchroni.StaticFilesServer.Services;
+using LaciSynchroni.StaticFilesServer.Utils;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SinusSynchronousStaticFilesServer.Controllers;
+namespace LaciSynchroni.StaticFilesServer.Controllers;
 
-[Route(SinusFiles.Cache)]
+[Route(FilesRoutes.Cache)]
 public class CacheController : ControllerBase
 {
     private readonly RequestFileStreamResultFactory _requestFileStreamResultFactory;
@@ -22,7 +22,7 @@ public class CacheController : ControllerBase
         _fileStatisticsService = fileStatisticsService;
     }
 
-    [HttpGet(SinusFiles.Cache_Get)]
+    [HttpGet(FilesRoutes.Cache_Get)]
     public async Task<IActionResult> GetFiles(Guid requestId)
     {
         _logger.LogDebug($"GetFile:{SinusUser}:{requestId}");

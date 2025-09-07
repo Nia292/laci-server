@@ -1,7 +1,7 @@
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 
-namespace SinusSynchronousStaticFilesServer;
+namespace LaciSynchroni.StaticFilesServer;
 
 public class Program
 {

@@ -1,4 +1,4 @@
-﻿namespace SinusSynchronousShared.Utils;
+﻿namespace LaciSynchroni.Shared.Utils;
 
 public static class SinusClaimTypes
 {

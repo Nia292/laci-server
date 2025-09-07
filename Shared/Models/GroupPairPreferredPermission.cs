@@ -1,4 +1,4 @@
-﻿namespace SinusSynchronousShared.Models;
+﻿namespace LaciSynchroni.Shared.Models;
 
 public class GroupPairPreferredPermission
 {

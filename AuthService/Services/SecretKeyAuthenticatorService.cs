@@ -1,13 +1,13 @@
 ﻿using System.Collections.Concurrent;
-using SinusSynchronousAuthService.Authentication;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.AuthService.Authentication;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.EntityFrameworkCore;
 
-namespace SinusSynchronousAuthService.Services;
+namespace LaciSynchroni.AuthService.Services;
 
 public class SecretKeyAuthenticatorService
 {

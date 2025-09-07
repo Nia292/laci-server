@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LaciSynchroni.Shared.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using SinusSynchronousShared.Utils;
 using System.Globalization;
 
-namespace SinusSynchronousShared.RequirementHandlers;
+namespace LaciSynchroni.Shared.RequirementHandlers;
 
 public class ValidTokenRequirementHandler : AuthorizationHandler<ValidTokenRequirement>
 {

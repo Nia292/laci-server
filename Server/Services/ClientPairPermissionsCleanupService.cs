@@ -1,14 +1,14 @@
 ﻿
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
 
-namespace SinusSynchronousServer.Services;
+namespace LaciSynchroni.Server.Services;
 
 public class ClientPairPermissionsCleanupService(ILogger<ClientPairPermissionsCleanupService> _logger, IDbContextFactory<SinusDbContext> _dbContextFactory,
     IConfigurationService<ServerConfiguration> _configurationService)

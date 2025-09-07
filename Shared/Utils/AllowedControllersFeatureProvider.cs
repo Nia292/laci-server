@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 
-namespace SinusSynchronousShared.Utils;
+namespace LaciSynchroni.Shared.Utils;
 
 public class AllowedControllersFeatureProvider : ControllerFeatureProvider
 {

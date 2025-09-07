@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 
-namespace SinusSynchronousServices.Discord;
+namespace LaciSynchroni.Services.Discord;
 
 // todo: remove all this crap at some point
 

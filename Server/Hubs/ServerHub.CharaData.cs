@@ -1,15 +1,15 @@
-﻿using SinusSynchronous.API.Data;
-using SinusSynchronous.API.Dto.CharaData;
-using SinusSynchronousServer.Utils;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Utils;
+﻿using LaciSynchroni.Common.Data;
+using LaciSynchroni.Common.Dto.CharaData;
+using LaciSynchroni.Server.Utils;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
-namespace SinusSynchronousServer.Hubs;
+namespace LaciSynchroni.Server.Hubs;
 
-public partial class SinusHub
+public partial class ServerHub
 {
     [Authorize(Policy = "Identified")]
     public async Task<CharaDataFullDto?> CharaDataCreate()

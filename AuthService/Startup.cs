@@ -1,25 +1,25 @@
-﻿using SinusSynchronousAuthService.Controllers;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
+﻿using LaciSynchroni.AuthService.Controllers;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.System.Text.Json;
 using StackExchange.Redis;
 using System.Net;
-using SinusSynchronousAuthService.Services;
-using SinusSynchronousShared.RequirementHandlers;
+using LaciSynchroni.AuthService.Services;
+using LaciSynchroni.Shared.RequirementHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using SinusSynchronousShared.Data;
+using LaciSynchroni.Shared.Data;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Utils.Configuration;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 
-namespace SinusSynchronousAuthService;
+namespace LaciSynchroni.AuthService;
 
 public class Startup
 {
@@ -206,7 +206,7 @@ public class Startup
             options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"), builder =>
             {
                 builder.MigrationsHistoryTable("_efmigrationshistory", "public");
-                builder.MigrationsAssembly("SinusSynchronousShared");
+                builder.MigrationsAssembly("LaciSynchroni.Shared");
             }).UseSnakeCaseNamingConvention();
             options.EnableThreadSafetyChecks(false);
         }, sinusConfig.GetValue(nameof(SinusConfigurationBase.DbContextPoolSize), 1024));
@@ -215,7 +215,7 @@ public class Startup
             options.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"), builder =>
             {
                 builder.MigrationsHistoryTable("_efmigrationshistory", "public");
-                builder.MigrationsAssembly("SinusSynchronousShared");
+                builder.MigrationsAssembly("LaciSynchroni.Shared");
             }).UseSnakeCaseNamingConvention();
             options.EnableThreadSafetyChecks(false);
         });

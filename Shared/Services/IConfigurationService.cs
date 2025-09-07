@@ -1,6 +1,6 @@
-﻿using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Shared.Utils.Configuration;
 
-namespace SinusSynchronousShared.Services;
+namespace LaciSynchroni.Shared.Services;
 
 public interface IConfigurationService<T> where T : class, ISinusConfiguration
 {

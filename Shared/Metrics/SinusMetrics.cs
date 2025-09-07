@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Prometheus;
 
-namespace SinusSynchronousShared.Metrics;
+namespace LaciSynchroni.Shared.Metrics;
 
 public class SinusMetrics
 {

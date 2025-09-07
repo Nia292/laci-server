@@ -1,13 +1,13 @@
-﻿using SinusSynchronous.API.Data;
-using SinusSynchronous.API.Data.Enum;
-using SinusSynchronous.API.Dto;
-using SinusSynchronous.API.Dto.CharaData;
-using SinusSynchronous.API.Dto.Group;
-using SinusSynchronous.API.Dto.User;
+﻿using LaciSynchroni.Common.Data;
+using LaciSynchroni.Common.Data.Enum;
+using LaciSynchroni.Common.Dto;
+using LaciSynchroni.Common.Dto.CharaData;
+using LaciSynchroni.Common.Dto.Group;
+using LaciSynchroni.Common.Dto.User;
 
-namespace SinusSynchronousServer.Hubs
+namespace LaciSynchroni.Server.Hubs
 {
-    public partial class SinusHub
+    public partial class ServerHub
     {
         public Task Client_DownloadReady(Guid requestId) => throw new PlatformNotSupportedException("Calling clientside method on server not supported");
 

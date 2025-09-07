@@ -1,4 +1,4 @@
-﻿namespace SinusSynchronousStaticFilesServer.Services;
+﻿namespace LaciSynchroni.StaticFilesServer.Services;
 
 public interface IClientReadyMessageService
 {

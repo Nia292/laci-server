@@ -1,4 +1,4 @@
-﻿namespace SinusSynchronousShared.Metrics;
+﻿namespace LaciSynchroni.Shared.Metrics;
 
 public class MetricsAPI
 {

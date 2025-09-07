@@ -1,4 +1,4 @@
-﻿namespace SinusSynchronousShared.RequirementHandlers;
+﻿namespace LaciSynchroni.Shared.RequirementHandlers;
 
 public enum UserRequirements
 {

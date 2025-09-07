@@ -1,15 +1,15 @@
-﻿using SinusSynchronous.API.Data;
-using SinusSynchronous.API.Dto.CharaData;
-using SinusSynchronousServer.Utils;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Utils;
+﻿using LaciSynchroni.Common.Data;
+using LaciSynchroni.Common.Dto.CharaData;
+using LaciSynchroni.Server.Utils;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
-namespace SinusSynchronousServer.Hubs;
+namespace LaciSynchroni.Server.Hubs;
 
-public partial class SinusHub
+public partial class ServerHub
 {
     private async Task<string?> GetUserGposeLobby()
     {

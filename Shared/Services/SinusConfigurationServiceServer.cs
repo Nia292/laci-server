@@ -1,10 +1,10 @@
-﻿using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.Extensions.Options;
 using System.Collections;
 using System.Text;
 
-namespace SinusSynchronousShared.Services;
+namespace LaciSynchroni.Shared.Services;
 
 public sealed class SinusConfigurationServiceServer<T> : IDisposable, IConfigurationService<T> where T : class, ISinusConfiguration
 {

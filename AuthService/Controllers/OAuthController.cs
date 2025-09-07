@@ -1,10 +1,10 @@
-﻿using SinusSynchronous.API.Routes;
-using SinusSynchronousAuthService.Services;
-using SinusSynchronousShared;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Common.Routes;
+using LaciSynchroni.AuthService.Services;
+using LaciSynchroni.Shared;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +16,9 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Web;
 
-namespace SinusSynchronousAuthService.Controllers;
+namespace LaciSynchroni.AuthService.Controllers;
 
-[Route(SinusAuth.OAuth)]
+[Route(AuthRoutes.OAuth)]
 public class OAuthController : AuthControllerBase
 {
     private const string _discordOAuthCall = "discordCall";
@@ -192,7 +192,7 @@ public class OAuthController : AuthControllerBase
     }
 
     [Authorize(Policy = "OAuthToken")]
-    [HttpPost(SinusAuth.OAuth_GetUIDsBasedOnSecretKeys)]
+    [HttpPost(AuthRoutes.OAuth_GetUIDsBasedOnSecretKeys)]
     public async Task<Dictionary<string, string>> GetUIDsBasedOnSecretKeys([FromBody] List<string> secretKeys)
     {
         if (!secretKeys.Any())
@@ -215,7 +215,7 @@ public class OAuthController : AuthControllerBase
     }
 
     [Authorize(Policy = "OAuthToken")]
-    [HttpPost(SinusAuth.OAuth_RenewOAuthToken)]
+    [HttpPost(AuthRoutes.OAuth_RenewOAuthToken)]
     public IActionResult RenewOAuthToken()
     {
         var claims = HttpContext.User.Claims.Where(c => c.Type != SinusClaimTypes.Expires).ToList();
@@ -224,7 +224,7 @@ public class OAuthController : AuthControllerBase
     }
 
     [AllowAnonymous]
-    [HttpGet(SinusAuth.OAuth_GetDiscordOAuthToken)]
+    [HttpGet(AuthRoutes.OAuth_GetDiscordOAuthToken)]
     public async Task<IActionResult> GetDiscordOAuthToken([FromQuery] string sessionId)
     {
         Logger.LogDebug("Starting to wait for GetDiscordOAuthToken for {session}", sessionId);
@@ -250,7 +250,7 @@ public class OAuthController : AuthControllerBase
     }
 
     [AllowAnonymous]
-    [HttpGet(SinusAuth.OAuth_GetDiscordOAuthEndpoint)]
+    [HttpGet(AuthRoutes.OAuth_GetDiscordOAuthEndpoint)]
     public Uri? GetDiscordOAuthEndpoint()
     {
         var discordOAuthUri = Configuration.GetValueOrDefault<Uri?>(nameof(AuthServiceConfiguration.PublicOAuthBaseUri), null);
@@ -263,7 +263,7 @@ public class OAuthController : AuthControllerBase
     }
 
     [Authorize(Policy = "OAuthToken")]
-    [HttpGet(SinusAuth.OAuth_GetUIDs)]
+    [HttpGet(AuthRoutes.OAuth_GetUIDs)]
     public async Task<Dictionary<string, string>> GetAvailableUIDs()
     {
         string primaryUid = HttpContext.User.Claims.Single(c => string.Equals(c.Type, SinusClaimTypes.Uid, StringComparison.Ordinal))!.Value;
@@ -278,7 +278,7 @@ public class OAuthController : AuthControllerBase
     }
 
     [Authorize(Policy = "OAuthToken")]
-    [HttpPost(SinusAuth.OAuth_CreateOAuth)]
+    [HttpPost(AuthRoutes.OAuth_CreateOAuth)]
     public async Task<IActionResult> CreateTokenWithOAuth(string uid, string charaIdent)
     {
         using var dbContext = await SinusDbContextFactory.CreateDbContextAsync();

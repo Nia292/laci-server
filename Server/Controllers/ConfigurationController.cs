@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SinusSynchronous.API.Dto.Server;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Common.Dto.Server;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 using System.Reflection;
 
-namespace SinusSynchronousServer.Controllers;
+namespace LaciSynchroni.Server.Controllers;
 
 [ApiController]
 [Route("/configuration")]

@@ -1,9 +1,9 @@
-﻿using SinusSynchronousShared;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Shared;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 using MaxMind.GeoIP2;
 
-namespace SinusSynchronousAuthService.Services;
+namespace LaciSynchroni.AuthService.Services;
 
 public class GeoIPService : IHostedService
 {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SinusSynchronousShared.Models;
+namespace LaciSynchroni.Shared.Models;
 
 public class UserProfileData
 {

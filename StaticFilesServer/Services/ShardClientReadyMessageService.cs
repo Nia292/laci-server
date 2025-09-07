@@ -1,10 +1,10 @@
-﻿using SinusSynchronous.API.Routes;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Common.Routes;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using System.Net.Http.Headers;
 
-namespace SinusSynchronousStaticFilesServer.Services;
+namespace LaciSynchroni.StaticFilesServer.Services;
 
 public class ShardClientReadyMessageService : IClientReadyMessageService
 {
@@ -25,7 +25,7 @@ public class ShardClientReadyMessageService : IClientReadyMessageService
     public async Task SendDownloadReady(string uid, Guid requestId)
     {
         var mainUrl = _configurationService.GetValue<Uri>(nameof(StaticFilesServerConfiguration.MainFileServerAddress));
-        var path = SinusFiles.MainSendReadyFullPath(mainUrl, uid, requestId);
+        var path = FilesRoutes.MainSendReadyFullPath(mainUrl, uid, requestId);
         using HttpRequestMessage msg = new()
         {
             RequestUri = path

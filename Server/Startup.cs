@@ -9,23 +9,23 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Prometheus;
-using SinusSynchronous.API.SignalR;
-using SinusSynchronousServer.Controllers;
-using SinusSynchronousServer.Hubs;
-using SinusSynchronousServer.Services;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.RequirementHandlers;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Common.SignalR;
+using LaciSynchroni.Server.Controllers;
+using LaciSynchroni.Server.Hubs;
+using LaciSynchroni.Server.Services;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.RequirementHandlers;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using StackExchange.Redis;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.System.Text.Json;
 using System.Net;
 using System.Text;
 
-namespace SinusSynchronousServer;
+namespace LaciSynchroni.Server;
 
 public class Startup
 {
@@ -362,7 +362,7 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapHub<SinusHub>(ISinusHub.Path, options =>
+            endpoints.MapHub<ServerHub>(IServerHub.Path, options =>
             {
                 options.ApplicationMaxBufferSize = 5242880;
                 options.TransportMaxBufferSize = 5242880;

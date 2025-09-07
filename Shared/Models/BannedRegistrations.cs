@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SinusSynchronousShared.Models;
+namespace LaciSynchroni.Shared.Models;
 
 public class BannedRegistrations
 {

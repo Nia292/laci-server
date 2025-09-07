@@ -1,7 +1,7 @@
-﻿using SinusSynchronousShared.Utils;
+﻿using LaciSynchroni.Shared.Utils;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SinusSynchronousStaticFilesServer.Controllers;
+namespace LaciSynchroni.StaticFilesServer.Controllers;
 
 public class ControllerBase : Controller
 {

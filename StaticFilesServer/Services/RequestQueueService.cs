@@ -1,11 +1,11 @@
-﻿using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
-using SinusSynchronousStaticFilesServer.Utils;
+﻿using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
+using LaciSynchroni.StaticFilesServer.Utils;
 using System.Collections.Concurrent;
 using System.Timers;
 
-namespace SinusSynchronousStaticFilesServer.Services;
+namespace LaciSynchroni.StaticFilesServer.Services;
 
 public class RequestQueueService : IHostedService
 {

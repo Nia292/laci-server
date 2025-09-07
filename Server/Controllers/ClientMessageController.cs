@@ -1,20 +1,20 @@
-﻿using SinusSynchronous.API.SignalR;
-using SinusSynchronousServer.Hubs;
-using SinusSynchronousShared.Utils;
+﻿using LaciSynchroni.Common.SignalR;
+using LaciSynchroni.Server.Hubs;
+using LaciSynchroni.Shared.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
-namespace SinusSynchronousServer.Controllers;
+namespace LaciSynchroni.Server.Controllers;
 
 [Route("/msgc")]
 [Authorize(Policy = "Internal")]
 public class ClientMessageController : Controller
 {
     private ILogger<ClientMessageController> _logger;
-    private IHubContext<SinusHub, ISinusHub> _hubContext;
+    private IHubContext<ServerHub, IServerHub> _hubContext;
 
-    public ClientMessageController(ILogger<ClientMessageController> logger, IHubContext<SinusHub, ISinusHub> hubContext)
+    public ClientMessageController(ILogger<ClientMessageController> logger, IHubContext<ServerHub, IServerHub> hubContext)
     {
         _logger = logger;
         _hubContext = hubContext;

@@ -1,7 +1,7 @@
-﻿using SinusSynchronousShared.Models;
+﻿using LaciSynchroni.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace SinusSynchronousShared.Data;
+namespace LaciSynchroni.Shared.Data;
 
 public class SinusDbContext : DbContext
 {
@@ -19,7 +19,7 @@ public class SinusDbContext : DbContext
         optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=sinus;Username=postgres", builder =>
         {
             builder.MigrationsHistoryTable("_efmigrationshistory", "public");
-            builder.MigrationsAssembly("SinusSynchronousShared");
+            builder.MigrationsAssembly("LaciSynchroni.Shared");
         }).UseSnakeCaseNamingConvention();
         optionsBuilder.EnableThreadSafetyChecks(false);
 

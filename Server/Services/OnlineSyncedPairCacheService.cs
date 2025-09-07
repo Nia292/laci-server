@@ -1,6 +1,6 @@
-﻿using SinusSynchronousShared.Metrics;
+﻿using LaciSynchroni.Shared.Metrics;
 
-namespace SinusSynchronousServer.Services;
+namespace LaciSynchroni.Server.Services;
 
 public class OnlineSyncedPairCacheService
 {

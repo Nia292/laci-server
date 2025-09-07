@@ -2,16 +2,16 @@
 using Discord.Interactions;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
-using SinusSynchronous.API.Data.Enum;
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Models;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Common.Data.Enum;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Models;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using StackExchange.Redis;
 using System.Net.Http.Headers;
 
-namespace SinusSynchronousServices.Discord;
+namespace LaciSynchroni.Services.Discord;
 
 public class SinusModule : InteractionModuleBase
 {

@@ -1,9 +1,9 @@
-﻿using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
-using SinusSynchronousStaticFilesServer.Services;
+﻿using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
+using LaciSynchroni.StaticFilesServer.Services;
 
-namespace SinusSynchronousStaticFilesServer.Utils;
+namespace LaciSynchroni.StaticFilesServer.Utils;
 
 public class RequestFileStreamResultFactory
 {

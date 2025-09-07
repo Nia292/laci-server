@@ -1,10 +1,10 @@
-﻿using SinusSynchronous.API.Dto.CharaData;
-using SinusSynchronous.API.SignalR;
-using SinusSynchronousServer.Hubs;
+﻿using LaciSynchroni.Common.Dto.CharaData;
+using LaciSynchroni.Common.SignalR;
+using LaciSynchroni.Server.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 
-namespace SinusSynchronousServer.Services;
+namespace LaciSynchroni.Server.Services;
 
 public sealed class GPoseLobbyDistributionService : IHostedService, IDisposable
 {
@@ -15,7 +15,7 @@ public sealed class GPoseLobbyDistributionService : IHostedService, IDisposable
     private readonly SemaphoreSlim _lobbyWorldDataModificationSemaphore = new(1, 1);
 
     public GPoseLobbyDistributionService(ILogger<GPoseLobbyDistributionService> logger, IRedisDatabase redisDb,
-        IHubContext<SinusHub, ISinusHub> hubContext)
+        IHubContext<ServerHub, IServerHub> hubContext)
     {
         _logger = logger;
         _redisDb = redisDb;
@@ -25,7 +25,7 @@ public sealed class GPoseLobbyDistributionService : IHostedService, IDisposable
     private bool _disposed;
     private readonly ILogger<GPoseLobbyDistributionService> _logger;
     private readonly IRedisDatabase _redisDb;
-    private readonly IHubContext<SinusHub, ISinusHub> _hubContext;
+    private readonly IHubContext<ServerHub, IServerHub> _hubContext;
 
     public void Dispose()
     {

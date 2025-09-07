@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace SinusSynchronousShared.Utils;
+namespace LaciSynchroni.Shared.Utils;
 
 public class IdBasedUserIdProvider : IUserIdProvider
 {

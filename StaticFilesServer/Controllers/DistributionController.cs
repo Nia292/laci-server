@@ -1,11 +1,11 @@
-﻿using SinusSynchronous.API.Routes;
-using SinusSynchronousStaticFilesServer.Services;
+﻿using LaciSynchroni.Common.Routes;
+using LaciSynchroni.StaticFilesServer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SinusSynchronousStaticFilesServer.Controllers;
+namespace LaciSynchroni.StaticFilesServer.Controllers;
 
-[Route(SinusFiles.Distribution)]
+[Route(FilesRoutes.Distribution)]
 public class DistributionController : ControllerBase
 {
     private readonly CachedFileProvider _cachedFileProvider;
@@ -15,7 +15,7 @@ public class DistributionController : ControllerBase
         _cachedFileProvider = cachedFileProvider;
     }
 
-    [HttpGet(SinusFiles.Distribution_Get)]
+    [HttpGet(FilesRoutes.Distribution_Get)]
     [Authorize(Policy = "Internal")]
     public async Task<IActionResult> GetFile(string file)
     {

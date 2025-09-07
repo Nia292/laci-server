@@ -1,13 +1,13 @@
-﻿using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Services;
-using SinusSynchronousStaticFilesServer.Utils;
+﻿using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.StaticFilesServer.Utils;
 using System.Collections.Concurrent;
 using System.Net.Http.Headers;
-using SinusSynchronousShared.Utils;
-using SinusSynchronous.API.Routes;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Common.Routes;
+using LaciSynchroni.Shared.Utils.Configuration;
 
-namespace SinusSynchronousStaticFilesServer.Services;
+namespace LaciSynchroni.StaticFilesServer.Services;
 
 public sealed class CachedFileProvider : IDisposable
 {
@@ -61,7 +61,7 @@ public sealed class CachedFileProvider : IDisposable
         if (TryCopyFromColdStorage(hash, destinationFilePath)) return;
 
         // if cold storage is not configured or file not found or error is present try to download file from remote
-        var downloadUrl = SinusFiles.DistributionGetFullPath(_remoteCacheSourceUri, hash);
+        var downloadUrl = FilesRoutes.DistributionGetFullPath(_remoteCacheSourceUri, hash);
         _logger.LogInformation("Did not find {hash}, downloading from {server}", hash, downloadUrl);
 
         using var requestMessage = new HttpRequestMessage(HttpMethod.Get, downloadUrl);

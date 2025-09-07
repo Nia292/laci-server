@@ -1,16 +1,16 @@
-﻿using SinusSynchronous.API.Data.Enum;
-using SinusSynchronous.API.Dto;
-using SinusSynchronous.API.Dto.Group;
-using SinusSynchronous.API.Dto.User;
-using SinusSynchronous.API.Data.Extensions;
-using SinusSynchronousServer.Utils;
+﻿using LaciSynchroni.Common.Data.Enum;
+using LaciSynchroni.Common.Dto;
+using LaciSynchroni.Common.Dto.Group;
+using LaciSynchroni.Common.Dto.User;
+using LaciSynchroni.Common.Data.Extensions;
+using LaciSynchroni.Server.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
-namespace SinusSynchronousServer.Hubs;
+namespace LaciSynchroni.Server.Hubs;
 
-public partial class SinusHub
+public partial class ServerHub
 {
     [Authorize(Policy = "Authenticated")]
     public async Task UserUpdateDefaultPermissions(DefaultPermissionsDto defaultPermissions)

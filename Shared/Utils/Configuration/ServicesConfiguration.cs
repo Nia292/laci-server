@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SinusSynchronousShared.Utils.Configuration;
+namespace LaciSynchroni.Shared.Utils.Configuration;
 
 public class ServicesConfiguration : SinusConfigurationBase
 {

@@ -1,14 +1,14 @@
-﻿using SinusSynchronousServer.Hubs;
+﻿using LaciSynchroni.Server.Hubs;
 using System.Runtime.CompilerServices;
 
-namespace SinusSynchronousServer.Utils;
+namespace LaciSynchroni.Server.Utils;
 
 public class SinusHubLogger
 {
-    private readonly SinusHub _hub;
-    private readonly ILogger<SinusHub> _logger;
+    private readonly ServerHub _hub;
+    private readonly ILogger<ServerHub> _logger;
 
-    public SinusHubLogger(SinusHub hub, ILogger<SinusHub> logger)
+    public SinusHubLogger(ServerHub hub, ILogger<ServerHub> logger)
     {
         _hub = hub;
         _logger = logger;

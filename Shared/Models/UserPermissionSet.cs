@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace SinusSynchronousShared.Models;
+namespace LaciSynchroni.Shared.Models;
 
 public class UserPermissionSet
 {

@@ -1,10 +1,10 @@
-﻿using SinusSynchronous.API.Routes;
-using SinusSynchronousStaticFilesServer.Services;
+﻿using LaciSynchroni.Common.Routes;
+using LaciSynchroni.StaticFilesServer.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SinusSynchronousStaticFilesServer.Controllers;
+namespace LaciSynchroni.StaticFilesServer.Controllers;
 
-[Route(SinusFiles.Request)]
+[Route(FilesRoutes.Request)]
 public class RequestController : ControllerBase
 {
     private readonly CachedFileProvider _cachedFileProvider;
@@ -17,7 +17,7 @@ public class RequestController : ControllerBase
     }
 
     [HttpGet]
-    [Route(SinusFiles.Request_Cancel)]
+    [Route(FilesRoutes.Request_Cancel)]
     public async Task<IActionResult> CancelQueueRequest(Guid requestId)
     {
         try
@@ -29,7 +29,7 @@ public class RequestController : ControllerBase
     }
 
     [HttpPost]
-    [Route(SinusFiles.Request_Enqueue)]
+    [Route(FilesRoutes.Request_Enqueue)]
     public async Task<IActionResult> PreRequestFilesAsync([FromBody] IEnumerable<string> files)
     {
         try
@@ -49,7 +49,7 @@ public class RequestController : ControllerBase
     }
 
     [HttpGet]
-    [Route(SinusFiles.Request_Check)]
+    [Route(FilesRoutes.Request_Check)]
     public async Task<IActionResult> CheckQueueAsync(Guid requestId, [FromBody] IEnumerable<string> files)
     {
         try

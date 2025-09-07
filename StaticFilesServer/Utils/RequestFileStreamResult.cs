@@ -1,8 +1,8 @@
-﻿using SinusSynchronousShared.Metrics;
-using SinusSynchronousStaticFilesServer.Services;
+﻿using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.StaticFilesServer.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SinusSynchronousStaticFilesServer.Utils;
+namespace LaciSynchroni.StaticFilesServer.Utils;
 
 public class RequestFileStreamResult : FileStreamResult
 {

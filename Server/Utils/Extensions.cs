@@ -1,10 +1,10 @@
-﻿using SinusSynchronous.API.Data;
-using SinusSynchronous.API.Data.Enum;
-using SinusSynchronous.API.Data.Extensions;
-using SinusSynchronousShared.Models;
-using static SinusSynchronousServer.Hubs.SinusHub;
+﻿using LaciSynchroni.Common.Data;
+using LaciSynchroni.Common.Data.Enum;
+using LaciSynchroni.Common.Data.Extensions;
+using LaciSynchroni.Shared.Models;
+using static LaciSynchroni.Server.Hubs.ServerHub;
 
-namespace SinusSynchronousServer.Utils;
+namespace LaciSynchroni.Server.Utils;
 
 public static class Extensions
 {

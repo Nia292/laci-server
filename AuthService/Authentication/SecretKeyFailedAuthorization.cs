@@ -1,4 +1,4 @@
-﻿namespace SinusSynchronousAuthService.Authentication;
+﻿namespace LaciSynchroni.AuthService.Authentication;
 
 internal record SecretKeyFailedAuthorization
 {

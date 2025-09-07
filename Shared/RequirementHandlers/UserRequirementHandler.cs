@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using SinusSynchronousShared.Data;
 using Microsoft.EntityFrameworkCore;
-using SinusSynchronousShared.Utils;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StackExchange.Redis.Extensions.Core.Abstractions;
-using Microsoft.Extensions.Logging;
 
-namespace SinusSynchronousShared.RequirementHandlers;
+namespace LaciSynchroni.Shared.RequirementHandlers;
 
 public class UserRequirementHandler : AuthorizationHandler<UserRequirement, HubInvocationContext>
 {

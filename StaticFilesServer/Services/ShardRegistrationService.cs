@@ -1,9 +1,9 @@
-﻿using SinusSynchronous.API.Routes;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Common.Routes;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 
-namespace SinusSynchronousStaticFilesServer.Services;
+namespace LaciSynchroni.StaticFilesServer.Services;
 
 public class ShardRegistrationService : IHostedService
 {
@@ -80,7 +80,7 @@ public class ShardRegistrationService : IHostedService
         Uri mainServer = _configurationService.GetValue<Uri>(nameof(StaticFilesServerConfiguration.MainFileServerAddress));
         _logger.LogInformation("Running heartbeat against Main {server}", mainServer);
 
-        using var heartBeat = await _httpClient.PostAsync(new Uri(mainServer, SinusFiles.Main + "/shardHeartbeat"), null, ct).ConfigureAwait(false);
+        using var heartBeat = await _httpClient.PostAsync(new Uri(mainServer, FilesRoutes.Main + "/shardHeartbeat"), null, ct).ConfigureAwait(false);
         heartBeat.EnsureSuccessStatusCode();
     }
 
@@ -93,7 +93,7 @@ public class ShardRegistrationService : IHostedService
         _logger.LogInformation("Config Value {varName}: {value}", nameof(ShardConfiguration.FileMatch), config.FileMatch);
         _logger.LogInformation("Config Value {varName}: {value}", nameof(ShardConfiguration.RegionUris), string.Join("; ", config.RegionUris.Select(k => k.Key + ":" + k.Value)));
 
-        using var register = await _httpClient.PostAsJsonAsync(new Uri(mainServer, SinusFiles.Main + "/shardRegister"), config, ct).ConfigureAwait(false);
+        using var register = await _httpClient.PostAsJsonAsync(new Uri(mainServer, FilesRoutes.Main + "/shardRegister"), config, ct).ConfigureAwait(false);
         register.EnsureSuccessStatusCode();
         _isRegistered = true;
     }
@@ -102,6 +102,6 @@ public class ShardRegistrationService : IHostedService
     {
         Uri mainServer = _configurationService.GetValue<Uri>(nameof(StaticFilesServerConfiguration.MainFileServerAddress));
         _logger.LogInformation("Unregistering Shard with Main {server}", mainServer);
-        using var heartBeat = await _httpClient.PostAsync(new Uri(mainServer, SinusFiles.Main + "/shardUnregister"), null).ConfigureAwait(false);
+        using var heartBeat = await _httpClient.PostAsync(new Uri(mainServer, FilesRoutes.Main + "/shardUnregister"), null).ConfigureAwait(false);
     }
 }

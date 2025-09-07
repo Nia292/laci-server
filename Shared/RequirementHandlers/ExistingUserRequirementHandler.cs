@@ -1,11 +1,11 @@
-﻿using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Utils;
+﻿using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
-namespace SinusSynchronousShared.RequirementHandlers;
+namespace LaciSynchroni.Shared.RequirementHandlers;
 public class ExistingUserRequirementHandler : AuthorizationHandler<ExistingUserRequirement>
 {
     private readonly IDbContextFactory<SinusDbContext> _dbContextFactory;

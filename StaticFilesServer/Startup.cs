@@ -1,10 +1,10 @@
-using SinusSynchronousShared.Data;
-using SinusSynchronousShared.Metrics;
-using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils;
-using SinusSynchronousStaticFilesServer.Controllers;
-using SinusSynchronousStaticFilesServer.Services;
-using SinusSynchronousStaticFilesServer.Utils;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.StaticFilesServer.Controllers;
+using LaciSynchroni.StaticFilesServer.Services;
+using LaciSynchroni.StaticFilesServer.Utils;
 using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -20,9 +20,9 @@ using StackExchange.Redis.Extensions.System.Text.Json;
 using StackExchange.Redis;
 using System.Net;
 using System.Text;
-using SinusSynchronousShared.Utils.Configuration;
+using LaciSynchroni.Shared.Utils.Configuration;
 
-namespace SinusSynchronousStaticFilesServer;
+namespace LaciSynchroni.StaticFilesServer;
 
 public class Startup
 {
@@ -269,7 +269,7 @@ public class Startup
         {
             if (_isMain)
             {
-                e.MapHub<SinusSynchronousServer.Hubs.SinusHub>("/dummyhub");
+                e.MapHub<Server.Hubs.ServerHub>("/dummyhub");
             }
 
             e.MapControllers();

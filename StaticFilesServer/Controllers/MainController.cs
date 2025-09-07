@@ -1,12 +1,12 @@
-﻿using SinusSynchronous.API.Routes;
-using SinusSynchronousShared.Utils.Configuration;
-using SinusSynchronousStaticFilesServer.Services;
+﻿using LaciSynchroni.Common.Routes;
+using LaciSynchroni.Shared.Utils.Configuration;
+using LaciSynchroni.StaticFilesServer.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SinusSynchronousStaticFilesServer.Controllers;
+namespace LaciSynchroni.StaticFilesServer.Controllers;
 
-[Route(SinusFiles.Main)]
+[Route(FilesRoutes.Main)]
 [Authorize(Policy = "Internal")]
 public class MainController : ControllerBase
 {
@@ -20,7 +20,7 @@ public class MainController : ControllerBase
         _shardRegistrationService = shardRegistrationService;
     }
 
-    [HttpGet(SinusFiles.Main_SendReady)]
+    [HttpGet(FilesRoutes.Main_SendReady)]
     public async Task<IActionResult> SendReadyToClients(string uid, Guid requestId)
     {
         await _messageService.SendDownloadReady(uid, requestId).ConfigureAwait(false);

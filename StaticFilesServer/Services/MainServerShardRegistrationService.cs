@@ -1,9 +1,9 @@
-﻿using SinusSynchronousShared.Services;
-using SinusSynchronousShared.Utils.Configuration;
+﻿using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils.Configuration;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
 
-namespace SinusSynchronousStaticFilesServer.Services;
+namespace LaciSynchroni.StaticFilesServer.Services;
 
 public class MainServerShardRegistrationService : IHostedService
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace SinusSynchronousShared;
+namespace LaciSynchroni.Shared;
 
 public static class Extensions
 {

@@ -1,4 +1,4 @@
-﻿namespace SinusSynchronousServer.Utils;
+﻿namespace LaciSynchroni.Server.Utils;
 
 public record PausedEntry
 {
