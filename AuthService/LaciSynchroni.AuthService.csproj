@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SinusSynchronousShared\SinusSynchronousShared.csproj" />
+    <ProjectReference Include="..\Shared\LaciSynchroni.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

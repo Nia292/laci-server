@@ -51,7 +51,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\SinusAPI\SinusSynchronousAPI\SinusSynchronous.API.csproj" />
+		<ProjectReference Include="..\Common\LaciSynchroni.Common.csproj" />
 	</ItemGroup>
 
 </Project>

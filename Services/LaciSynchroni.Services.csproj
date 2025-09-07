@@ -35,8 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SinusAPI\SinusSynchronousAPI\SinusSynchronous.API.csproj" />
-    <ProjectReference Include="..\SinusSynchronousShared\SinusSynchronousShared.csproj" />
+    <ProjectReference Include="..\Common\LaciSynchroni.Common.csproj" />
+    <ProjectReference Include="..\Shared\LaciSynchroni.Shared.csproj" />
   </ItemGroup>
 
 </Project>
