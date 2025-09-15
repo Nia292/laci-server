@@ -25,7 +25,7 @@ services:
       - cache:/data
 
   sinus-server:
-    image: syrilai/sinus-synchronous-server:latest
+    image: ghcr.io/lacisynchroni/server:latest
     restart: on-failure
     environment:
       SinusSynchronous__CdnFullUrl: "${SINUS_CDNURL}"
@@ -48,7 +48,7 @@ services:
       timeout: 1s
 
   sinus-services:
-    image: syrilai/sinus-synchronous-services:latest
+    image: ghcr.io/lacisynchroni/services:latest
     restart: on-failure
     environment:
       SinusSynchronous__DiscordBotToken: "${SINUS_DISCORD_TOKEN}"
@@ -68,7 +68,7 @@ services:
         condition: service_healthy
 
   sinus-auth:
-    image: syrilai/sinus-synchronous-authservice:latest
+    image: ghcr.io/lacisynchroni/authservice:latest
     restart: on-failure
     environment:
       SinusSynchronous__PublicOAuthBaseUri: "${SINUS_PUBLIC_OAUTH_BASE_URI}"
@@ -90,7 +90,7 @@ services:
         condition: service_healthy
 
   sinus-files:
-    image: syrilai/sinus-synchronous-staticfilesserver:latest
+    image: ghcr.io/lacisynchroni/staticfilesserver:latest
     restart: on-failure
     environment:
       SinusSynchronous__CdnFullUrl: "${SINUS_CDNURL}"

@@ -20,12 +20,12 @@ RUN adduser \
         --system \
         laci
 
-COPY --from=build /build /opt/LaciSynchroniAuthService
-RUN chown -R laci:laci /opt/LaciSynchroniAuthService && \
+COPY --from=build /build /opt/LaciSynchroni/AuthService
+RUN chown -R laci:laci /opt/LaciSynchroni/AuthService && \
     apt-get update && apt-get install curl -y && \
     rm -rf /var/lib/apt/lists/*
 
 USER laci:laci
-WORKDIR /opt/LaciSynchroniAuthService
+WORKDIR /opt/LaciSynchroni/AuthService
 
-CMD ["./LaciSynchroniAuthService"]
+CMD ["./LaciSynchroni.AuthService"]

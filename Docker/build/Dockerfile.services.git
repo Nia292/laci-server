@@ -20,12 +20,12 @@ RUN adduser \
         --system \
         laci
 
-COPY --from=build /build /opt/LaciSynchroniServices
-RUN chown -R laci:laci /opt/LaciSynchroniServices && \
+COPY --from=build /build /opt/LaciSynchroni/Services
+RUN chown -R laci:laci /opt/LaciSynchroni/Services && \
     apt-get update && apt-get install curl -y && \
     rm -rf /var/lib/apt/lists/*
 
 USER laci:laci
-WORKDIR /opt/LaciSynchroniServices
+WORKDIR /opt/LaciSynchroni/Services
 
-CMD ["./LaciSynchroniServices"]
+CMD ["./LaciSynchroni.Services"]
