@@ -3,7 +3,6 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 COPY Common /server/Common
 COPY Shared /server/Shared
 COPY Server /server/Server
-COPY AuthService /server/AuthService
 
 WORKDIR /server/Server/
 
@@ -23,12 +22,12 @@ RUN adduser \
         --system \
         laci
 
-COPY --from=build /build /opt/LaciSynchroniServer
-RUN chown -R laci:laci /opt/LaciSynchroniServer && \
+COPY --from=build /build /opt/LaciSynchroni/Server
+RUN chown -R laci:laci /opt/LaciSynchroni/Server && \
     apt-get update && apt-get install curl -y && \
     rm -rf /var/lib/apt/lists/*
 
 USER laci:laci
-WORKDIR /opt/LaciSynchroniServer
+WORKDIR /opt/LaciSynchroni/Server
 
-CMD ["./LaciSynchroniServer"]
+CMD ["./LaciSynchroni.Server"]
