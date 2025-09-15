@@ -38,7 +38,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\LaciSynchroni.Common.csproj" />
     <ProjectReference Include="..\Shared\LaciSynchroni.Shared.csproj" />
-    <ProjectReference Include="..\AuthService\LaciSynchroni.AuthService.csproj" />
   </ItemGroup>
 
 </Project>
