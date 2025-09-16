@@ -133,7 +133,8 @@ public partial class LaciWizardModule : InteractionModuleBase
         _logger.LogInformation("{method}:{userId}", nameof(StartWizard), Context.Interaction.User.Id);
 
         using var db = await GetDbContext().ConfigureAwait(false);
-        bool hasAccount = await db.LodeStoneAuth.AnyAsync(u => u.DiscordId == Context.User.Id && u.StartedAt == null).ConfigureAwait(false);
+        var account = await db.LodeStoneAuth.Include(u => u.User).FirstOrDefaultAsync(u => u.DiscordId == Context.User.Id && u.StartedAt == null).ConfigureAwait(false);
+        bool hasAccount = account != null;
 
         if (init)
         {
@@ -159,6 +160,7 @@ public partial class LaciWizardModule : InteractionModuleBase
             + (!hasAccount ? string.Empty : ("- You lost your secret key press \"🏥 Recover\"" + Environment.NewLine))
             + (!hasAccount ? string.Empty : ("- Create a secondary UIDs press \"2️⃣ Secondary UID\"" + Environment.NewLine))
             + (!hasAccount ? string.Empty : ("- Set a Vanity UID press \"💅 Vanity IDs\"" + Environment.NewLine))
+            + (!hasAccount || (!account?.User?.IsAdmin ?? false) ? string.Empty : ("- Add a mod to the forbidden transfers list press \"🚫 Block mod\"" + Environment.NewLine))
             + (!hasAccount ? string.Empty : ("- Delete your primary or secondary accounts with \"⚠️ Delete\""))
             );
         eb.WithColor(Color.Blue);
@@ -174,7 +176,11 @@ public partial class LaciWizardModule : InteractionModuleBase
             cb.WithButton("Recover", "wizard-recover", ButtonStyle.Secondary, new Emoji("🏥"));
             cb.WithButton("Secondary UID", "wizard-secondary", ButtonStyle.Secondary, new Emoji("2️⃣"));
             cb.WithButton("Vanity IDs", "wizard-vanity", ButtonStyle.Secondary, new Emoji("💅"));
-            cb.WithButton("Delete", "wizard-delete", ButtonStyle.Danger, new Emoji("⚠️"));
+            if (account?.User?.IsAdmin ?? false)
+            {
+                cb.WithButton("Block mod", "wizard-blockmod", ButtonStyle.Secondary, new Emoji("🚫"));
+            }
+            cb.WithButton("Delete", "wizard-delete", ButtonStyle.Danger, new Emoji("⚠️"), row: 1);
         }
 
         await InitOrUpdateInteraction(init, eb, cb).ConfigureAwait(false);
@@ -205,6 +211,25 @@ public partial class LaciWizardModule : InteractionModuleBase
         [InputLabel("Enter \"DELETE\" in all Caps")]
         [ModalTextInput("confirmation", TextInputStyle.Short, "Enter DELETE")]
         public string Delete { get; set; }
+    }
+
+    public class BlockModModal : IModal
+    {
+        public string Title => "Block Mod";
+
+        [InputLabel("Mod Hash")]
+        [ModalTextInput("mod_hash", TextInputStyle.Short, "40 characters, hex", 40, 40)]
+        public string ModHash
+        {
+            get; set;
+        }
+
+        [InputLabel("Forbidden because")]
+        [ModalTextInput("forbidden_by", TextInputStyle.Short, "1 to 100 characters", 1, 100)]
+        public string ForbiddenBy
+        {
+            get; set;
+        }
     }
 
     private async Task<LaciDbContext> GetDbContext()
