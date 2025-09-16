@@ -224,7 +224,7 @@ public partial class LaciWizardModule : InteractionModuleBase
             get; set;
         }
 
-        [InputLabel("Forbidden by")]
+        [InputLabel("Forbidden because")]
         [ModalTextInput("forbidden_by", TextInputStyle.Short, "1 to 100 characters", 1, 100)]
         public string ForbiddenBy
         {
