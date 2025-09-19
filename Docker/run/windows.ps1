@@ -3,8 +3,7 @@ param(
     [switch]$Standalone,
     [switch]$Sharded,
     # Mode
-    [switch]$Start,
-    [switch]$Stop
+    $Mode
 )
 
 function Import-DotEnv {
@@ -41,6 +40,32 @@ function Import-DotEnv {
 
 Import-DotEnv "./compose/.env.local"
 
+if (!(Test-Path config/standalone/base.appsettings.json ))
+{
+    Write-Error "Base appsettings not found!"
+    exit 1
+}
+if (!(Test-Path config/standalone/authservice.appsettings.json ))
+{
+    Write-Error "Auth service appsettings not found!"
+    exit 1
+}
+if (!(Test-Path config/standalone/files.appsettings.json ))
+{
+    Write-Error "Files appsettings not found!"
+    exit 1
+}
+if (!(Test-Path config/standalone/server.appsettings.json ))
+{
+    Write-Error "Server appsettings not found!"
+    exit 1
+}
+if (!(Test-Path config/standalone/services.appsettings.json ))
+{
+    Write-Error "Services appsettings not found!"
+    exit 1
+}
+
 if ($Standalone -and $Sharded) {
     Write-Error "You cannot use -Standalone and -Sharded together."
     exit 1
@@ -51,7 +76,7 @@ if (-not $Standalone -and -not $Sharded) {
     exit 1
 }
 
-if ($Start) {
+if ($Mode -eq "start") {
     if ($Standalone) {
         Write-Host "Starting in Standalone mode..."
         docker compose -f "$PSScriptRoot/compose/standalone.yml" -p standalone up -d
@@ -61,7 +86,7 @@ if ($Start) {
         docker compose -f "$PSScriptRoot/compose/sharded.yml" -p sharded up -d
     }
 }
-elseif ($Stop) {
+elseif ($Mode -eq "stop") {
     if ($Standalone) {
         Write-Host "Stopping Standalone service..."
         docker compose -f "$PSScriptRoot/compose/standalone.yml" -p standalone stop
@@ -72,7 +97,7 @@ elseif ($Stop) {
     }
 }
 else {
-    # neither -Start nor -Stop supplied
+    # neither Start nor Stop supplied
     if ($Standalone) {
         Write-Host "Running other Standalone action..."
         docker compose -f "$PSScriptRoot/compose/standalone.yml" -p standalone up
