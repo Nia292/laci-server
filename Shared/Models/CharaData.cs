@@ -23,7 +23,7 @@ public class CharaData
     public string UploaderUID { get; set; }
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public CharaDataAccess AccessType { get; set; }
     public CharaDataShare ShareType { get; set; }
     public DateTime? ExpiryDate { get; set; }
@@ -57,13 +57,13 @@ public class CharaDataOriginalFile
     public string ParentId { get; set; }
     public string ParentUploaderUID { get; set; }
     public string GamePath { get; set; }
-    public string Hash { get; set; }
+    public string? Hash { get; set; }
 }
 
 public class CharaDataFile
 {
-    public virtual FileCache FileCache { get; set; }
-    public string FileCacheHash { get; set; }
+    public virtual FileCache? FileCache { get; set; }
+    public string? FileCacheHash { get; set; }
     public string GamePath { get; set; }
     public virtual CharaData Parent { get; set; }
     public string ParentId { get; set; }
@@ -76,7 +76,7 @@ public class CharaDataFileSwap
     public string ParentId { get; set; }
     public string ParentUploaderUID { get; set; }
     public string GamePath { get; set; }
-    public string FilePath { get; set; }
+    public string? FilePath { get; set; }
 }
 
 public class CharaDataPose
@@ -85,7 +85,7 @@ public class CharaDataPose
     public virtual CharaData Parent { get; set; }
     public string ParentId { get; set; }
     public string ParentUploaderUID { get; set; }
-    public string Description { get; set; }
-    public string PoseData { get; set; }
-    public string WorldData { get; set; }
+    public string? Description { get; set; }
+    public string? PoseData { get; set; }
+    public string? WorldData { get; set; }
 }

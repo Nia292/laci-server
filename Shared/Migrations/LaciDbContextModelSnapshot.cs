@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LaciSynchroni.Shared.Migrations
 {
     [DbContext(typeof(LaciDbContext))]
-    partial class MareDbContextModelSnapshot : ModelSnapshot
+    partial class LaciDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -22,7 +22,7 @@ namespace LaciSynchroni.Shared.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("MareSynchronosShared.Models.Auth", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.Auth", b =>
                 {
                     b.Property<string>("HashedKey")
                         .HasMaxLength(64)
@@ -57,7 +57,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("auth", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.Banned", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.Banned", b =>
                 {
                     b.Property<string>("CharacterIdentification")
                         .HasMaxLength(100)
@@ -80,7 +80,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("banned_users", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.BannedRegistrations", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.BannedRegistrations", b =>
                 {
                     b.Property<string>("DiscordIdOrLodestoneAuth")
                         .HasMaxLength(100)
@@ -93,7 +93,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("banned_registrations", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaData", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaData", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text")
@@ -155,7 +155,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("chara_data", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataAllowance", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataAllowance", b =>
                 {
                     b.Property<string>("ParentId")
                         .HasColumnType("text")
@@ -195,7 +195,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("chara_data_allowance", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataFile", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataFile", b =>
                 {
                     b.Property<string>("ParentId")
                         .HasColumnType("text")
@@ -225,7 +225,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("chara_data_files", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataFileSwap", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataFileSwap", b =>
                 {
                     b.Property<string>("ParentId")
                         .HasColumnType("text")
@@ -252,7 +252,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("chara_data_file_swaps", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataOriginalFile", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataOriginalFile", b =>
                 {
                     b.Property<string>("ParentId")
                         .HasColumnType("text")
@@ -279,7 +279,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("chara_data_orig_files", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataPose", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataPose", b =>
                 {
                     b.Property<string>("ParentId")
                         .HasColumnType("text")
@@ -317,7 +317,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("chara_data_poses", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.ClientPair", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.ClientPair", b =>
                 {
                     b.Property<string>("UserUID")
                         .HasMaxLength(10)
@@ -347,7 +347,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("client_pairs", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.FileCache", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.FileCache", b =>
                 {
                     b.Property<string>("Hash")
                         .HasMaxLength(40)
@@ -390,7 +390,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("file_caches", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.ForbiddenUploadEntry", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.ForbiddenUploadEntry", b =>
                 {
                     b.Property<string>("Hash")
                         .HasMaxLength(40)
@@ -414,7 +414,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("forbidden_upload_entries", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.Group", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.Group", b =>
                 {
                     b.Property<string>("GID")
                         .HasMaxLength(20)
@@ -459,7 +459,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("groups", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.GroupBan", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.GroupBan", b =>
                 {
                     b.Property<string>("GroupGID")
                         .HasColumnType("character varying(20)")
@@ -496,7 +496,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("group_bans", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.GroupPair", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.GroupPair", b =>
                 {
                     b.Property<string>("GroupGID")
                         .HasColumnType("character varying(20)")
@@ -526,7 +526,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("group_pairs", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.GroupPairPreferredPermission", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.GroupPairPreferredPermission", b =>
                 {
                     b.Property<string>("UserUID")
                         .HasColumnType("character varying(10)")
@@ -564,7 +564,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("group_pair_preferred_permissions", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.GroupTempInvite", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.GroupTempInvite", b =>
                 {
                     b.Property<string>("GroupGID")
                         .HasColumnType("character varying(20)")
@@ -591,7 +591,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("group_temp_invites", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.LodeStoneAuth", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.LodeStoneAuth", b =>
                 {
                     b.Property<decimal>("DiscordId")
                         .ValueGeneratedOnAdd()
@@ -625,7 +625,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("lodestone_auth", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.User", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.User", b =>
                 {
                     b.Property<string>("UID")
                         .HasMaxLength(10)
@@ -661,7 +661,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.UserDefaultPreferredPermission", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.UserDefaultPreferredPermission", b =>
                 {
                     b.Property<string>("UserUID")
                         .HasMaxLength(10)
@@ -705,7 +705,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("user_default_preferred_permissions", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.UserPermissionSet", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.UserPermissionSet", b =>
                 {
                     b.Property<string>("UserUID")
                         .HasColumnType("character varying(10)")
@@ -750,7 +750,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("user_permission_sets", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.UserProfileData", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.UserProfileData", b =>
                 {
                     b.Property<string>("UserUID")
                         .HasColumnType("character varying(10)")
@@ -782,14 +782,14 @@ namespace LaciSynchroni.Shared.Migrations
                     b.ToTable("user_profile_data", (string)null);
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.Auth", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.Auth", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "PrimaryUser")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "PrimaryUser")
                         .WithMany()
                         .HasForeignKey("PrimaryUserUID")
                         .HasConstraintName("fk_auth_users_primary_user_uid");
 
-                    b.HasOne("MareSynchronosShared.Models.User", "User")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserUID")
                         .HasConstraintName("fk_auth_users_user_uid");
@@ -799,9 +799,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaData", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaData", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "Uploader")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "Uploader")
                         .WithMany()
                         .HasForeignKey("UploaderUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -811,21 +811,21 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Uploader");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataAllowance", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataAllowance", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.Group", "AllowedGroup")
+                    b.HasOne("LaciSynchroni.Shared.Models.Group", "AllowedGroup")
                         .WithMany()
                         .HasForeignKey("AllowedGroupGID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_chara_data_allowance_groups_allowed_group_gid");
 
-                    b.HasOne("MareSynchronosShared.Models.User", "AllowedUser")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "AllowedUser")
                         .WithMany()
                         .HasForeignKey("AllowedUserUID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_chara_data_allowance_users_allowed_user_uid");
 
-                    b.HasOne("MareSynchronosShared.Models.CharaData", "Parent")
+                    b.HasOne("LaciSynchroni.Shared.Models.CharaData", "Parent")
                         .WithMany("AllowedIndividiuals")
                         .HasForeignKey("ParentId", "ParentUploaderUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -839,15 +839,15 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataFile", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataFile", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.FileCache", "FileCache")
+                    b.HasOne("LaciSynchroni.Shared.Models.FileCache", "FileCache")
                         .WithMany()
                         .HasForeignKey("FileCacheHash")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_chara_data_files_files_file_cache_hash");
 
-                    b.HasOne("MareSynchronosShared.Models.CharaData", "Parent")
+                    b.HasOne("LaciSynchroni.Shared.Models.CharaData", "Parent")
                         .WithMany("Files")
                         .HasForeignKey("ParentId", "ParentUploaderUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -859,9 +859,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataFileSwap", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataFileSwap", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.CharaData", "Parent")
+                    b.HasOne("LaciSynchroni.Shared.Models.CharaData", "Parent")
                         .WithMany("FileSwaps")
                         .HasForeignKey("ParentId", "ParentUploaderUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -871,9 +871,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataOriginalFile", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataOriginalFile", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.CharaData", "Parent")
+                    b.HasOne("LaciSynchroni.Shared.Models.CharaData", "Parent")
                         .WithMany("OriginalFiles")
                         .HasForeignKey("ParentId", "ParentUploaderUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -883,9 +883,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaDataPose", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaDataPose", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.CharaData", "Parent")
+                    b.HasOne("LaciSynchroni.Shared.Models.CharaData", "Parent")
                         .WithMany("Poses")
                         .HasForeignKey("ParentId", "ParentUploaderUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -895,16 +895,16 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.ClientPair", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.ClientPair", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "OtherUser")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "OtherUser")
                         .WithMany()
                         .HasForeignKey("OtherUserUID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_client_pairs_users_other_user_uid");
 
-                    b.HasOne("MareSynchronosShared.Models.User", "User")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -916,9 +916,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.FileCache", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.FileCache", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "Uploader")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "Uploader")
                         .WithMany()
                         .HasForeignKey("UploaderUID")
                         .HasConstraintName("fk_file_caches_users_uploader_uid");
@@ -926,9 +926,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Uploader");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.Group", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.Group", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "Owner")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerUID")
                         .HasConstraintName("fk_groups_users_owner_uid");
@@ -936,21 +936,21 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.GroupBan", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.GroupBan", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "BannedBy")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "BannedBy")
                         .WithMany()
                         .HasForeignKey("BannedByUID")
                         .HasConstraintName("fk_group_bans_users_banned_by_uid");
 
-                    b.HasOne("MareSynchronosShared.Models.User", "BannedUser")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "BannedUser")
                         .WithMany()
                         .HasForeignKey("BannedUserUID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_group_bans_users_banned_user_uid");
 
-                    b.HasOne("MareSynchronosShared.Models.Group", "Group")
+                    b.HasOne("LaciSynchroni.Shared.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupGID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -964,16 +964,16 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Group");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.GroupPair", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.GroupPair", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.Group", "Group")
+                    b.HasOne("LaciSynchroni.Shared.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupGID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_group_pairs_groups_group_gid");
 
-                    b.HasOne("MareSynchronosShared.Models.User", "GroupUser")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "GroupUser")
                         .WithMany()
                         .HasForeignKey("GroupUserUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -985,16 +985,16 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("GroupUser");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.GroupPairPreferredPermission", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.GroupPairPreferredPermission", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.Group", "Group")
+                    b.HasOne("LaciSynchroni.Shared.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupGID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_group_pair_preferred_permissions_groups_group_gid");
 
-                    b.HasOne("MareSynchronosShared.Models.User", "User")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1006,9 +1006,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.GroupTempInvite", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.GroupTempInvite", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.Group", "Group")
+                    b.HasOne("LaciSynchroni.Shared.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupGID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1018,9 +1018,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("Group");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.LodeStoneAuth", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.LodeStoneAuth", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "User")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserUID")
                         .HasConstraintName("fk_lodestone_auth_users_user_uid");
@@ -1028,9 +1028,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.UserDefaultPreferredPermission", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.UserDefaultPreferredPermission", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "User")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1040,16 +1040,16 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.UserPermissionSet", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.UserPermissionSet", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "OtherUser")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "OtherUser")
                         .WithMany()
                         .HasForeignKey("OtherUserUID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_user_permission_sets_users_other_user_uid");
 
-                    b.HasOne("MareSynchronosShared.Models.User", "User")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1061,9 +1061,9 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.UserProfileData", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.UserProfileData", b =>
                 {
-                    b.HasOne("MareSynchronosShared.Models.User", "User")
+                    b.HasOne("LaciSynchroni.Shared.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserUID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1073,7 +1073,7 @@ namespace LaciSynchroni.Shared.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MareSynchronosShared.Models.CharaData", b =>
+            modelBuilder.Entity("LaciSynchroni.Shared.Models.CharaData", b =>
                 {
                     b.Navigation("AllowedIndividiuals");
 
