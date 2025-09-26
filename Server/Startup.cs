@@ -47,11 +47,6 @@ public class Startup
 
         var config = Configuration.GetRequiredSection("LaciSynchroni");
 
-        services.Configure<ForwardedHeadersOptions>(options =>
-        {
-            options.KnownNetworks.Clear();
-            options.KnownProxies.Clear();
-        });
         services.Configure<ForwardedHeadersOptions>(Configuration.GetSection("ForwardedHeaders"));
 
         // configure metrics

@@ -74,11 +74,6 @@ public class Startup
 
         services.AddSingleton<ServerTokenGenerator>();
 
-        services.Configure<ForwardedHeadersOptions>(options =>
-        {
-            options.KnownNetworks.Clear();
-            options.KnownProxies.Clear();
-        });
         services.Configure<ForwardedHeadersOptions>(_configuration.GetSection("ForwardedHeaders"));
 
         ConfigureAuthorization(services);
