@@ -8,8 +8,8 @@ public class Auth
     [MaxLength(64)]
     public string HashedKey { get; set; }
 
-    public string UserUID { get; set; }
-    public User User { get; set; }
+    public string? UserUID { get; set; }
+    public User? User { get; set; }
     public bool MarkForBan { get; set; }
     public bool IsBanned { get; set; }
     public string? PrimaryUserUID { get; set; }

@@ -7,7 +7,7 @@ public class LodeStoneAuth
     [Key]
     public ulong DiscordId { get; set; }
     [MaxLength(100)]
-    public string HashedLodestoneId { get; set; }
+    public string? HashedLodestoneId { get; set; }
     [MaxLength(100)]
     public string? LodestoneAuthString { get; set; }
     public User? User { get; set; }
