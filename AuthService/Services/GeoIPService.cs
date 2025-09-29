@@ -32,7 +32,7 @@ public class GeoIPService : IHostedService
 
         try
         {
-            var remoteIp = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
+            var remoteIp = httpContextAccessor.HttpContext?.GetClientIpAddress();
 
             using CancellationTokenSource waitCts = new();
             waitCts.CancelAfter(TimeSpan.FromSeconds(5));

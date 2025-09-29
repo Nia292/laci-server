@@ -24,7 +24,7 @@ public class SignalRLimitFilter : IHubFilter
     public async ValueTask<object> InvokeMethodAsync(
         HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object>> next)
     {
-        var remoteIp = accessor.HttpContext?.Connection.RemoteIpAddress;
+        var remoteIp = accessor.HttpContext?.GetClientIpAddress();
         var client = new ClientRequestIdentity
         {
             ClientIp = remoteIp?.ToString(),

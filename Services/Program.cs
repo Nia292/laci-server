@@ -1,6 +1,7 @@
-using LaciSynchroni.Services;
 using LaciSynchroni.Shared.Services;
 using LaciSynchroni.Shared.Utils.Configuration;
+
+namespace LaciSynchroni.Services;
 
 public class Program
 {

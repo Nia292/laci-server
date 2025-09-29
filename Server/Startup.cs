@@ -5,6 +5,7 @@ using LaciSynchroni.Common.SignalR;
 using LaciSynchroni.Server.Controllers;
 using LaciSynchroni.Server.Hubs;
 using LaciSynchroni.Server.Services;
+using LaciSynchroni.Shared;
 using LaciSynchroni.Shared.Data;
 using LaciSynchroni.Shared.Metrics;
 using LaciSynchroni.Shared.RequirementHandlers;
@@ -349,7 +350,7 @@ public class Startup
 
         var config = app.ApplicationServices.GetRequiredService<IConfigurationService<LaciConfigurationBase>>();
 
-        app.UseForwardedHeaders();
+        app.UseCustomIpAddressHandling();
         app.UseIpRateLimiting();
 
         app.UseRouting();

@@ -2,6 +2,7 @@
 using System.Text;
 using LaciSynchroni.AuthService.Controllers;
 using LaciSynchroni.AuthService.Services;
+using LaciSynchroni.Shared;
 using LaciSynchroni.Shared.Data;
 using LaciSynchroni.Shared.Metrics;
 using LaciSynchroni.Shared.RequirementHandlers;
@@ -33,7 +34,7 @@ public class Startup
     {
         var config = app.ApplicationServices.GetRequiredService<IConfigurationService<LaciConfigurationBase>>();
 
-        app.UseForwardedHeaders();
+        app.UseCustomIpAddressHandling();
         app.UseRouting();
 
         app.UseHttpMetrics();

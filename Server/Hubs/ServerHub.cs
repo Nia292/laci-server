@@ -145,7 +145,7 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
     [Authorize(Policy = "Authenticated")]
     public override async Task OnConnectedAsync()
     {
-        var remoteIp = _contextAccessor.HttpContext?.Connection.RemoteIpAddress;
+        var remoteIp = _contextAccessor.HttpContext?.GetClientIpAddress();
         if (_userConnections.TryGetValue(UserUID, out var oldId))
         {
             _logger.LogCallWarning(ServerHubLogger.Args(remoteIp, "UpdatingId", oldId, Context.ConnectionId));
@@ -174,7 +174,7 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
     [Authorize(Policy = "Authenticated")]
     public override async Task OnDisconnectedAsync(Exception exception)
     {
-        var remoteIp = _contextAccessor.HttpContext?.Connection.RemoteIpAddress;
+        var remoteIp = _contextAccessor.HttpContext?.GetClientIpAddress();
         if (_userConnections.TryGetValue(UserUID, out var connectionId)
             && string.Equals(connectionId, Context.ConnectionId, StringComparison.Ordinal))
         {
