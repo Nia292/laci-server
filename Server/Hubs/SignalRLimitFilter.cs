@@ -5,26 +5,26 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace LaciSynchroni.Server.Hubs;
+
 public class SignalRLimitFilter : IHubFilter
 {
-    private readonly IRateLimitProcessor _processor;
-    private readonly IHttpContextAccessor accessor;
+    private readonly IpRateLimitProcessor _processor;
     private readonly ILogger<SignalRLimitFilter> logger;
     private static readonly SemaphoreSlim ConnectionLimiterSemaphore = new(20, 20);
     private static readonly SemaphoreSlim DisconnectLimiterSemaphore = new(20, 20);
 
     public SignalRLimitFilter(
-        IOptions<IpRateLimitOptions> options, IProcessingStrategy processing, IIpPolicyStore policyStore, IHttpContextAccessor accessor, ILogger<SignalRLimitFilter> logger)
+        IOptions<IpRateLimitOptions> options, IProcessingStrategy processing, IIpPolicyStore policyStore, ILogger<SignalRLimitFilter> logger)
     {
         _processor = new IpRateLimitProcessor(options?.Value, policyStore, processing);
-        this.accessor = accessor;
         this.logger = logger;
     }
 
     public async ValueTask<object> InvokeMethodAsync(
         HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object>> next)
     {
-        var remoteIp = accessor.HttpContext?.GetClientIpAddress();
+
+        var remoteIp = invocationContext.Context.GetHttpContext()?.GetClientIpAddress();
         var client = new ClientRequestIdentity
         {
             ClientIp = remoteIp?.ToString(),
@@ -53,7 +53,7 @@ public class SignalRLimitFilter : IHubFilter
         await ConnectionLimiterSemaphore.WaitAsync().ConfigureAwait(false);
         try
         {
-            var ip = accessor.GetIpAddress();
+            var ip = context.Context.GetHttpContext()?.GetClientIpAddress()?.ToString();
             var client = new ClientRequestIdentity
             {
                 ClientIp = ip,

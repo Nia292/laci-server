@@ -24,7 +24,6 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
     private static readonly ConcurrentDictionary<string, string> _userConnections = new(StringComparer.Ordinal);
     private readonly LaciMetrics _metrics;
     private readonly SystemInfoService _systemInfoService;
-    private readonly IHttpContextAccessor _contextAccessor;
     private readonly ServerHubLogger _logger;
     private readonly string _shardName;
     private readonly int _maxExistingGroupsByUser;
@@ -44,7 +43,7 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
 
     public ServerHub(LaciMetrics metrics,
         IDbContextFactory<LaciDbContext> dbContextFactory, ILogger<ServerHub> logger, SystemInfoService systemInfoService,
-        IConfigurationService<ServerConfiguration> configuration, IHttpContextAccessor contextAccessor,
+        IConfigurationService<ServerConfiguration> configuration,
         IRedisDatabase redisDb, OnlineSyncedPairCacheService onlineSyncedPairCacheService, LaciCensus census,
         GPoseLobbyDistributionService gPoseLobbyDistributionService)
     {
@@ -59,7 +58,6 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
         _maxCharaDataByUser = configuration.GetValueOrDefault(nameof(ServerConfiguration.MaxCharaDataByUser), 10);
         _maxCharaDataByUserVanity = configuration.GetValueOrDefault(nameof(ServerConfiguration.MaxCharaDataByUserVanity), 50);
         _serverName = configuration.GetValueOrDefault(nameof(ServerConfiguration.ServerName), "Laci Synchroni");
-        _contextAccessor = contextAccessor;
         _redis = redisDb;
         _onlineSyncedPairCacheService = onlineSyncedPairCacheService;
         _census = census;
@@ -145,7 +143,7 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
     [Authorize(Policy = "Authenticated")]
     public override async Task OnConnectedAsync()
     {
-        var remoteIp = _contextAccessor.HttpContext?.GetClientIpAddress();
+        var remoteIp = Context.GetHttpContext()?.GetClientIpAddress();
         if (_userConnections.TryGetValue(UserUID, out var oldId))
         {
             _logger.LogCallWarning(ServerHubLogger.Args(remoteIp, "UpdatingId", oldId, Context.ConnectionId));
@@ -174,7 +172,7 @@ public partial class ServerHub : Hub<IServerHub>, IServerHub
     [Authorize(Policy = "Authenticated")]
     public override async Task OnDisconnectedAsync(Exception exception)
     {
-        var remoteIp = _contextAccessor.HttpContext?.GetClientIpAddress();
+        var remoteIp = Context.GetHttpContext()?.GetClientIpAddress();
         if (_userConnections.TryGetValue(UserUID, out var connectionId)
             && string.Equals(connectionId, Context.ConnectionId, StringComparison.Ordinal))
         {

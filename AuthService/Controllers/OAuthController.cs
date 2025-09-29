@@ -26,11 +26,11 @@ public class OAuthController : AuthControllerBase
     private static readonly ConcurrentDictionary<string, string> _cookieOAuthResponse = [];
 
     public OAuthController(ILogger<OAuthController> logger,
-    IHttpContextAccessor accessor, IDbContextFactory<LaciDbContext> dbContextFactory,
+    IDbContextFactory<LaciDbContext> dbContextFactory,
     SecretKeyAuthenticatorService secretKeyAuthenticatorService,
     IConfigurationService<AuthServiceConfiguration> configuration,
     IDatabase redisDb)
-        : base(logger, accessor, dbContextFactory, secretKeyAuthenticatorService,
+        : base(logger, dbContextFactory, secretKeyAuthenticatorService,
             configuration, redisDb)
     {
     }
@@ -282,19 +282,18 @@ public class OAuthController : AuthControllerBase
     public async Task<IActionResult> CreateTokenWithOAuth(string uid, string charaIdent)
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();
-
-        return await AuthenticateOAuthInternal(dbContext, uid, charaIdent);
+        return await AuthenticateOAuthInternal(HttpContext, dbContext, uid, charaIdent);
     }
 
-    private async Task<IActionResult> AuthenticateOAuthInternal(LaciDbContext dbContext, string requestedUid, string charaIdent)
+    private async Task<IActionResult> AuthenticateOAuthInternal(HttpContext httpContext, LaciDbContext dbContext, string requestedUid, string charaIdent)
     {
         try
         {
-            string primaryUid = HttpContext.User.Claims.Single(c => string.Equals(c.Type, LaciClaimTypes.Uid, StringComparison.Ordinal))!.Value;
+            string primaryUid = httpContext.User.Claims.Single(c => string.Equals(c.Type, LaciClaimTypes.Uid, StringComparison.Ordinal))!.Value;
             if (string.IsNullOrEmpty(requestedUid)) return BadRequest("No UID");
             if (string.IsNullOrEmpty(charaIdent)) return BadRequest("No CharaIdent");
 
-            var remoteIp = HttpAccessor.HttpContext?.GetClientIpAddress()?.ToString();
+            var remoteIp = HttpContext.GetClientIpAddress()?.ToString();
 
             var authResult = await SecretKeyAuthenticatorService.AuthorizeOauthAsync(remoteIp, primaryUid, requestedUid);
 

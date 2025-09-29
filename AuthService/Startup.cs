@@ -42,7 +42,7 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
 
-        KestrelMetricServer metricServer = new KestrelMetricServer(config.GetValueOrDefault<int>(nameof(LaciConfigurationBase.MetricsPort), 4985));
+        var metricServer = new KestrelMetricServer(config.GetValueOrDefault(nameof(LaciConfigurationBase.MetricsPort), 4985));
         metricServer.Start();
 
         app.UseEndpoints(endpoints =>
@@ -61,14 +61,12 @@ public class Startup
     {
         var config = _configuration.GetRequiredSection("LaciSynchroni");
 
-        services.AddHttpContextAccessor();
-
         ConfigureRedis(services, config);
 
         services.AddSingleton<SecretKeyAuthenticatorService>();
-        services.AddSingleton<GeoIPService>();
+        services.AddSingleton<GeoIpService>();
 
-        services.AddHostedService(provider => provider.GetRequiredService<GeoIPService>());
+        services.AddHostedService(provider => provider.GetRequiredService<GeoIpService>());
 
         services.Configure<AuthServiceConfiguration>(config);
         services.Configure<LaciConfigurationBase>(config);

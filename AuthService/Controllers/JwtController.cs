@@ -16,11 +16,11 @@ namespace LaciSynchroni.AuthService.Controllers;
 public class JwtController : AuthControllerBase
 {
     public JwtController(ILogger<JwtController> logger,
-        IHttpContextAccessor accessor, IDbContextFactory<LaciDbContext> dbContextFactory,
+        IDbContextFactory<LaciDbContext> dbContextFactory,
         SecretKeyAuthenticatorService secretKeyAuthenticatorService,
         IConfigurationService<AuthServiceConfiguration> configuration,
         IDatabase redisDb)
-            : base(logger, accessor, dbContextFactory, secretKeyAuthenticatorService,
+            : base(logger, dbContextFactory, secretKeyAuthenticatorService,
                 configuration, redisDb)
     {
     }
@@ -30,7 +30,7 @@ public class JwtController : AuthControllerBase
     public async Task<IActionResult> CreateToken(string auth, string charaIdent)
     {
         using var dbContext = await DbContextFactory.CreateDbContextAsync();
-        return await AuthenticateInternal(dbContext, auth, charaIdent).ConfigureAwait(false);
+        return await AuthenticateInternal(HttpContext, dbContext, auth, charaIdent).ConfigureAwait(false);
     }
 
     [Authorize(Policy = "Authenticated")]
@@ -67,14 +67,14 @@ public class JwtController : AuthControllerBase
         }
     }
 
-    protected async Task<IActionResult> AuthenticateInternal(LaciDbContext dbContext, string auth, string charaIdent)
+    protected async Task<IActionResult> AuthenticateInternal(HttpContext httpContext, LaciDbContext dbContext, string auth, string charaIdent)
     {
         try
         {
             if (string.IsNullOrEmpty(auth)) return BadRequest("No Authkey");
             if (string.IsNullOrEmpty(charaIdent)) return BadRequest("No CharaIdent");
 
-            var remoteIp = HttpAccessor.HttpContext?.GetClientIpAddress()?.ToString();
+            var remoteIp = httpContext.GetClientIpAddress()?.ToString();
 
             var authResult = await SecretKeyAuthenticatorService.AuthorizeAsync(remoteIp, auth);
 

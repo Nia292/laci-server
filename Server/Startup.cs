@@ -42,8 +42,6 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddHttpContextAccessor();
-
         services.AddTransient(_ => Configuration);
 
         var config = Configuration.GetRequiredSection("LaciSynchroni");
