@@ -6,8 +6,8 @@ public class GroupBan
     public string GroupGID { get; set; }
     public User BannedUser { get; set; }
     public string BannedUserUID { get; set; }
-    public User BannedBy { get; set; }
-    public string BannedByUID { get; set; }
+    public User? BannedBy { get; set; }
+    public string? BannedByUID { get; set; }
     public DateTime BannedOn { get; set; }
-    public string BannedReason { get; set; }
+    public string? BannedReason { get; set; }
 }

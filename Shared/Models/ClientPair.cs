@@ -11,5 +11,5 @@ public class ClientPair
     public string OtherUserUID { get; set; }
     public User OtherUser { get; set; }
     [Timestamp]
-    public byte[] Timestamp { get; set; }
+    public byte[]? Timestamp { get; set; }
 }
