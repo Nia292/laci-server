@@ -12,12 +12,12 @@ namespace LaciSynchroni.Services;
 
 public class Startup
 {
-    public Startup(Microsoft.Extensions.Configuration.IConfiguration configuration)
+    public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
     }
 
-    public Microsoft.Extensions.Configuration.IConfiguration Configuration { get; }
+    public IConfiguration Configuration { get; }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {

@@ -1,4 +1,17 @@
+using System.Net;
+using System.Text;
 using AspNetCoreRateLimit;
+using LaciSynchroni.Common.SignalR;
+using LaciSynchroni.Server.Controllers;
+using LaciSynchroni.Server.Hubs;
+using LaciSynchroni.Server.Services;
+using LaciSynchroni.Shared;
+using LaciSynchroni.Shared.Data;
+using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.RequirementHandlers;
+using LaciSynchroni.Shared.Services;
+using LaciSynchroni.Shared.Utils;
+using LaciSynchroni.Shared.Utils.Configuration;
 using MessagePack;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,21 +22,9 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Prometheus;
-using LaciSynchroni.Common.SignalR;
-using LaciSynchroni.Server.Controllers;
-using LaciSynchroni.Server.Hubs;
-using LaciSynchroni.Server.Services;
-using LaciSynchroni.Shared.Data;
-using LaciSynchroni.Shared.Metrics;
-using LaciSynchroni.Shared.RequirementHandlers;
-using LaciSynchroni.Shared.Services;
-using LaciSynchroni.Shared.Utils;
-using LaciSynchroni.Shared.Utils.Configuration;
 using StackExchange.Redis;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.System.Text.Json;
-using System.Net;
-using System.Text;
 
 namespace LaciSynchroni.Server;
 
@@ -31,21 +32,21 @@ public class Startup
 {
     private readonly ILogger<Startup> _logger;
 
-    public Startup(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<Startup> logger)
+    public Startup(IConfiguration configuration, ILogger<Startup> logger)
     {
         Configuration = configuration;
         _logger = logger;
     }
 
-    public Microsoft.Extensions.Configuration.IConfiguration Configuration { get; }
+    public IConfiguration Configuration { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddHttpContextAccessor();
-
         services.AddTransient(_ => Configuration);
 
         var config = Configuration.GetRequiredSection("LaciSynchroni");
+
+        services.Configure<ForwardedHeadersOptions>(Configuration.GetSection("ForwardedHeaders"));
 
         // configure metrics
         ConfigureMetrics(services);
@@ -347,6 +348,7 @@ public class Startup
 
         var config = app.ApplicationServices.GetRequiredService<IConfigurationService<LaciConfigurationBase>>();
 
+        app.UseCustomIpAddressHandling();
         app.UseIpRateLimiting();
 
         app.UseRouting();

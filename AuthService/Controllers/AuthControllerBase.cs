@@ -19,20 +19,18 @@ namespace LaciSynchroni.AuthService.Controllers;
 public abstract class AuthControllerBase : Controller
 {
     protected readonly ILogger Logger;
-    protected readonly IHttpContextAccessor HttpAccessor;
     protected readonly IConfigurationService<AuthServiceConfiguration> Configuration;
     protected readonly IDbContextFactory<LaciDbContext> DbContextFactory;
     protected readonly SecretKeyAuthenticatorService SecretKeyAuthenticatorService;
     private readonly IDatabase _redis;
 
     protected AuthControllerBase(ILogger logger,
-    IHttpContextAccessor accessor, IDbContextFactory<LaciDbContext> dbContextFactory,
+    IDbContextFactory<LaciDbContext> dbContextFactory,
     SecretKeyAuthenticatorService secretKeyAuthenticatorService,
     IConfigurationService<AuthServiceConfiguration> configuration,
     IDatabase redisDb)
     {
         Logger = logger;
-        HttpAccessor = accessor;
         _redis = redisDb;
         DbContextFactory = dbContextFactory;
         SecretKeyAuthenticatorService = secretKeyAuthenticatorService;

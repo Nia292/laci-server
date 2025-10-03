@@ -43,8 +43,6 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddHttpContextAccessor();
-
         services.AddLogging();
 
         services.Configure<StaticFilesServerConfiguration>(Configuration.GetRequiredSection("LaciSynchroni"));
@@ -212,7 +210,7 @@ public class Startup
             }
         });
 
-        // authentication and authorization 
+        // authentication and authorization
         services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
             .Configure<IConfigurationService<LaciConfigurationBase>>((o, s) =>
             {
@@ -260,7 +258,7 @@ public class Startup
 #pragma warning restore IDISP004 // Don't ignore created IDisposable
 #pragma warning restore IDISP001 // Dispose created
 
-        app.UseHttpMetrics(); 
+        app.UseHttpMetrics();
 
         app.UseAuthentication();
         app.UseAuthorization();

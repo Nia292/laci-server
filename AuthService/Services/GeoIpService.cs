@@ -5,9 +5,9 @@ using MaxMind.GeoIP2;
 
 namespace LaciSynchroni.AuthService.Services;
 
-public class GeoIPService : IHostedService
+public class GeoIpService : IHostedService
 {
-    private readonly ILogger<GeoIPService> _logger;
+    private readonly ILogger<GeoIpService> _logger;
     private readonly IConfigurationService<AuthServiceConfiguration> _authServiceConfiguration;
     private bool _useGeoIP = false;
     private string _cityFile = string.Empty;
@@ -16,14 +16,14 @@ public class GeoIPService : IHostedService
     private CancellationTokenSource _fileWriteTimeCheckCts = new();
     private bool _processingReload = false;
 
-    public GeoIPService(ILogger<GeoIPService> logger,
+    public GeoIpService(ILogger<GeoIpService> logger,
         IConfigurationService<AuthServiceConfiguration> authServiceConfiguration)
     {
         _logger = logger;
         _authServiceConfiguration = authServiceConfiguration;
     }
 
-    public async Task<string> GetCountryFromIP(IHttpContextAccessor httpContextAccessor)
+    public async Task<string> GetCountryFromIp(HttpContext httpContext)
     {
         if (!_useGeoIP)
         {
@@ -32,13 +32,13 @@ public class GeoIPService : IHostedService
 
         try
         {
-            var ip = httpContextAccessor.GetIpAddress();
+            var remoteIp = httpContext.GetClientIpAddress();
 
             using CancellationTokenSource waitCts = new();
             waitCts.CancelAfter(TimeSpan.FromSeconds(5));
             while (_processingReload) await Task.Delay(100, waitCts.Token).ConfigureAwait(false);
 
-            if (_dbReader!.TryCity(ip, out var response))
+            if (remoteIp != null && _dbReader!.TryCity(remoteIp, out var response))
             {
                 string? continent = response?.Continent.Code;
                 if (!string.IsNullOrEmpty(continent) &&

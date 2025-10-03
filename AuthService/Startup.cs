@@ -1,32 +1,30 @@
-﻿using LaciSynchroni.AuthService.Controllers;
+﻿using System.Net;
+using System.Text;
+using LaciSynchroni.AuthService.Controllers;
+using LaciSynchroni.AuthService.Services;
+using LaciSynchroni.Shared;
+using LaciSynchroni.Shared.Data;
 using LaciSynchroni.Shared.Metrics;
+using LaciSynchroni.Shared.RequirementHandlers;
 using LaciSynchroni.Shared.Services;
 using LaciSynchroni.Shared.Utils;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using StackExchange.Redis.Extensions.Core.Configuration;
-using StackExchange.Redis.Extensions.System.Text.Json;
-using StackExchange.Redis;
-using System.Net;
-using LaciSynchroni.AuthService.Services;
-using LaciSynchroni.Shared.RequirementHandlers;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using LaciSynchroni.Shared.Data;
-using Microsoft.EntityFrameworkCore;
-using Prometheus;
 using LaciSynchroni.Shared.Utils.Configuration;
-using StackExchange.Redis.Extensions.Core.Abstractions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Prometheus;
+using StackExchange.Redis;
 
 namespace LaciSynchroni.AuthService;
 
 public class Startup
 {
-    private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+    private readonly IConfiguration _configuration;
     private ILogger<Startup> _logger;
 
-    public Startup(Microsoft.Extensions.Configuration.IConfiguration configuration, ILogger<Startup> logger)
+    public Startup(IConfiguration configuration, ILogger<Startup> logger)
     {
         _configuration = configuration;
         _logger = logger;
@@ -36,6 +34,7 @@ public class Startup
     {
         var config = app.ApplicationServices.GetRequiredService<IConfigurationService<LaciConfigurationBase>>();
 
+        app.UseCustomIpAddressHandling();
         app.UseRouting();
 
         app.UseHttpMetrics();
@@ -43,7 +42,7 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
 
-        KestrelMetricServer metricServer = new KestrelMetricServer(config.GetValueOrDefault<int>(nameof(LaciConfigurationBase.MetricsPort), 4985));
+        var metricServer = new KestrelMetricServer(config.GetValueOrDefault(nameof(LaciConfigurationBase.MetricsPort), 4985));
         metricServer.Start();
 
         app.UseEndpoints(endpoints =>
@@ -62,19 +61,19 @@ public class Startup
     {
         var config = _configuration.GetRequiredSection("LaciSynchroni");
 
-        services.AddHttpContextAccessor();
-
         ConfigureRedis(services, config);
 
         services.AddSingleton<SecretKeyAuthenticatorService>();
-        services.AddSingleton<GeoIPService>();
+        services.AddSingleton<GeoIpService>();
 
-        services.AddHostedService(provider => provider.GetRequiredService<GeoIPService>());
+        services.AddHostedService(provider => provider.GetRequiredService<GeoIpService>());
 
         services.Configure<AuthServiceConfiguration>(config);
         services.Configure<LaciConfigurationBase>(config);
 
         services.AddSingleton<ServerTokenGenerator>();
+
+        services.Configure<ForwardedHeadersOptions>(_configuration.GetSection("ForwardedHeaders"));
 
         ConfigureAuthorization(services);
 
@@ -183,7 +182,7 @@ public class Startup
         var endpoint = options.EndPoints[0];
         string address = "";
         int port = 0;
-        
+
         if (endpoint is DnsEndPoint dnsEndPoint) { address = dnsEndPoint.Host; port = dnsEndPoint.Port; }
         if (endpoint is IPEndPoint ipEndPoint) { address = ipEndPoint.Address.ToString(); port = ipEndPoint.Port; }
 
