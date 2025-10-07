@@ -20,6 +20,7 @@ jobs:
       matrix:
         service:
           - name: server
+            
           - name: authservice
           - name: staticfilesserver
           - name: services
@@ -51,7 +52,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ matrix.service.name }}
+          images: ghcr.io/${{ github.repository_owner }}/laci-server/${{ matrix.service.name }}
           tags: |
             # Strip 'v' prefix from version tags: v1.2.3 -> 1.2.3
             type=semver,pattern={{version}}
@@ -74,6 +75,6 @@ jobs:
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/${{ matrix.service.name }}
+          subject-name: ghcr.io/${{ github.repository_owner }}/laci-server/${{ matrix.service.name }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
