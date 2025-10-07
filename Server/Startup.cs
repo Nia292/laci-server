@@ -110,9 +110,11 @@ public class Startup
             services.AddSingleton<CharaDataCleanupService>();
             services.AddHostedService(provider => provider.GetService<CharaDataCleanupService>());
             services.AddHostedService<ClientPairPermissionsCleanupService>();
+            services.AddHostedService<PeriodicMessageService>();
         }
 
         services.AddSingleton<GPoseLobbyDistributionService>();
+        services.AddSingleton<MessagingService>();
         services.AddHostedService(provider => provider.GetService<GPoseLobbyDistributionService>());
     }
 
